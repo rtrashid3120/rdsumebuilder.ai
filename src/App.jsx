@@ -6,7 +6,7 @@ import AISuggestionModal from './components/AISuggestionModal';
 import LoginPage from './components/LoginPage';
 import { sampleResume, emptyResume } from './data/sampleResume';
 import html2pdf from 'html2pdf.js';
-import { Info } from 'lucide-react';
+import { Info, Edit3, Eye } from 'lucide-react';
 
 export default function App() {
   // User Authentication State
@@ -15,7 +15,7 @@ export default function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
-  // Persistent Draft State Initializer (Restores draft even after closing browser)
+  // Persistent Draft State Initializer
   const [resume, setResume] = useState(() => {
     try {
       const savedDraft = localStorage.getItem('savedResumeDraft');
@@ -30,9 +30,9 @@ export default function App() {
   const [activeFont, setActiveFont] = useState('sans');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [showSaveToast, setShowSaveToast] = useState(false);
   
+  // Mobile View Tab Mode ('editor' | 'preview')
+  const [mobileTab, setMobileTab] = useState('editor');
   const [themeMode, setThemeMode] = useState('system');
 
   const [sectionOrder, setSectionOrder] = useState([
@@ -50,14 +50,36 @@ export default function App() {
     jobTitle: ''
   });
 
-  // Auto-Save Draft to LocalStorage on Every Keystroke
+  // 🔴 100% SILENT LIVE KEYSTROKE AUTO-SAVE TO LOCALSTORAGE & MONGODB CLOUD
   useEffect(() => {
     try {
       localStorage.setItem('savedResumeDraft', JSON.stringify(resume));
     } catch (e) {
       console.error('LocalStorage write error:', e);
     }
-  }, [resume]);
+
+    // Debounced background MongoDB sync
+    const timer = setTimeout(async () => {
+      if (currentUser?.email) {
+        try {
+          await fetch('/api/resumes/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              email: currentUser.email, 
+              resumeData: resume,
+              template: activeTemplate,
+              accentColor
+            })
+          });
+        } catch (err) {
+          // Silent catch
+        }
+      }
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [resume, currentUser, activeTemplate, accentColor]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -99,35 +121,6 @@ export default function App() {
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('resumeBuilderUser');
-  };
-
-  // Manual 1-Click Save Progress Handler
-  const handleSaveResume = async () => {
-    setIsSaving(true);
-    try {
-      // Local Save
-      localStorage.setItem('savedResumeDraft', JSON.stringify(resume));
-
-      // Cloud Save to MongoDB backend if user has account
-      if (currentUser?.email) {
-        await fetch('/api/resumes/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            email: currentUser.email, 
-            resumeData: resume,
-            template: activeTemplate,
-            accentColor
-          })
-        });
-      }
-    } catch (err) {
-      console.log('Local persistence saved automatically:', err.message);
-    } finally {
-      setIsSaving(false);
-      setShowSaveToast(true);
-      setTimeout(() => setShowSaveToast(false), 3500);
-    }
   };
 
   // Safe Deep Field Path Updater
@@ -247,7 +240,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[var(--bg-app)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-red-600 selection:text-white transition-colors duration-300">
       
-      {/* App Header Bar with Top-Right Log Out Button & Save Progress Button */}
+      {/* App Header Bar */}
       <Header
         onLoadSample={() => setResume(sampleResume)}
         onClear={() => setResume(emptyResume)}
@@ -266,14 +259,40 @@ export default function App() {
         setThemeMode={setThemeMode}
         currentUser={currentUser}
         onLogout={handleLogout}
-        onSaveResume={handleSaveResume}
-        isSaving={isSaving}
-        showSaveToast={showSaveToast}
       />
 
       {/* Main Workspace Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 md:p-6 lg:p-8">
         
+        {/* Mobile View Switcher Bar (Only visible on screens < lg) */}
+        {!isPreviewMode && (
+          <div className="lg:hidden flex grid grid-cols-2 bg-slate-900 border border-slate-800 p-1 rounded-2xl mb-4 shadow-lg text-xs font-bold">
+            <button
+              onClick={() => setMobileTab('editor')}
+              className={`flex items-center justify-center gap-2 py-2.5 rounded-xl transition-all cursor-pointer ${
+                mobileTab === 'editor'
+                  ? 'bg-red-600 text-white shadow-md font-extrabold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Edit3 className="w-4 h-4" />
+              <span>Form Editor</span>
+            </button>
+
+            <button
+              onClick={() => setMobileTab('preview')}
+              className={`flex items-center justify-center gap-2 py-2.5 rounded-xl transition-all cursor-pointer ${
+                mobileTab === 'preview'
+                  ? 'bg-red-600 text-white shadow-md font-extrabold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Eye className="w-4 h-4 text-yellow-400" />
+              <span>Resume Preview (A4)</span>
+            </button>
+          </div>
+        )}
+
         {/* Full Preview Mode View */}
         {isPreviewMode ? (
           <div className="flex flex-col items-center justify-center space-y-4">
@@ -302,16 +321,21 @@ export default function App() {
             </div>
           </div>
         ) : (
-          /* Dual-Pane Split Layout */
+          /* Dual-Pane Split Layout (Mobile Optimized) */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
             {/* Left Column: Interactive Forms */}
-            <div className="lg:col-span-5 space-y-4 no-print z-10">
+            <div className={`lg:col-span-5 space-y-4 no-print z-10 ${
+              mobileTab === 'editor' ? 'block' : 'hidden lg:block'
+            }`}>
               <div className="flex items-center justify-between">
                 <h2 className="text-xs font-extrabold uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-2">
                   Resume Form Editor
                 </h2>
-                <span className="text-xs font-medium text-[var(--text-secondary)]">Live Auto-Syncing</span>
+                <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live Auto-Syncing
+                </span>
               </div>
 
               <FormSection
@@ -324,14 +348,16 @@ export default function App() {
             </div>
 
             {/* Right Column: Live A4 Canvas Preview */}
-            <div className="lg:col-span-7 sticky top-20 space-y-4 z-0 min-w-0">
+            <div className={`lg:col-span-7 sticky top-20 space-y-4 z-0 min-w-0 ${
+              mobileTab === 'preview' ? 'block' : 'hidden lg:block'
+            }`}>
               <div className="no-print flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-xl border border-[var(--border-color)] text-xs text-[var(--text-primary)] font-semibold shadow-md">
-                <span>✨ <strong>Direct Edit Mode</strong>: Click any text on the A4 resume to edit live</span>
+                <span>✨ <strong>Direct Edit Mode</strong>: Click any text to edit live</span>
                 <span className="capitalize text-yellow-400 font-bold">{activeTemplate}</span>
               </div>
 
               {/* A4 Canvas Scroll Container */}
-              <div className="w-full overflow-x-auto p-3 sm:p-5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl flex justify-center backdrop-blur-sm min-h-[700px]">
+              <div className="w-full overflow-x-auto p-2 sm:p-5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl flex justify-center backdrop-blur-sm min-h-[600px] sm:min-h-[700px]">
                 <ResumePreview
                   resume={resume}
                   template={activeTemplate}

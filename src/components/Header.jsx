@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Sun, Moon, Laptop, Check, Pipette, FileSignature, User, LogOut, Save, CheckCircle2 } from 'lucide-react';
+import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Sun, Moon, Laptop, Check, Pipette, FileSignature, User, LogOut } from 'lucide-react';
 import { exportAsDocx } from '../utils/exportHelpers';
 import ATSScoreMeter from './ATSScoreMeter';
 import CoverLetterModal from './CoverLetterModal';
@@ -22,10 +22,7 @@ export default function Header({
   themeMode,
   setThemeMode,
   currentUser,
-  onLogout,
-  onSaveResume,
-  isSaving,
-  showSaveToast
+  onLogout
 }) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
@@ -83,24 +80,15 @@ export default function Header({
   const ThemeIcon = themeIcons[themeMode] || Laptop;
 
   return (
-    <header className="no-print sticky top-0 z-40 bg-slate-950/95 dark:bg-black/95 backdrop-blur-md border-b border-slate-800 text-white px-4 lg:px-8 py-2.5 shadow-2xl transition-all">
-      
-      {/* Toast Save Notification Banner */}
-      {showSaveToast && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-emerald-950 border border-emerald-500 text-emerald-300 text-xs font-bold px-4 py-2 rounded-2xl shadow-2xl flex items-center gap-2 animate-fade-in">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400 animate-bounce" />
-          <span>💾 Resume Draft Saved Successfully! Your progress will be saved even after closing browser.</span>
-        </div>
-      )}
-
-      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <header className="no-print sticky top-0 z-40 bg-slate-950/95 dark:bg-black/95 backdrop-blur-md border-b border-slate-800 text-white px-3 sm:px-4 lg:px-8 py-2.5 shadow-2xl transition-all">
+      <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-3">
         
         {/* Brand Executive Logo & Title */}
-        <div className="flex items-center gap-3">
-          <ExecutiveLogo className="w-10 h-10" />
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <ExecutiveLogo className="w-9 h-9 sm:w-10 sm:h-10 shrink-0" />
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-lg font-black tracking-tight text-white leading-none">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <h1 className="text-base sm:text-lg font-black tracking-tight text-white leading-none">
                 ResumeBuilder<span className="text-red-500">.ai</span>
               </h1>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-yellow-400/10 text-yellow-400 border border-yellow-400/30">
@@ -113,17 +101,17 @@ export default function Header({
         </div>
 
         {/* Customization Toolbar */}
-        <div className="flex items-center gap-2 bg-slate-900/90 px-3 py-1.5 rounded-xl border border-slate-800 shadow-inner">
+        <div className="flex items-center gap-1.5 sm:gap-2 bg-slate-900/90 px-2.5 py-1.5 rounded-xl border border-slate-800 shadow-inner overflow-x-auto max-w-full">
           
           {/* ATS Readiness Score Badge */}
           <ATSScoreMeter resume={resume} />
 
           <div className="h-4 w-px bg-slate-800" />
 
-          {/* AI Matching Cover Letter Generator Toggle Button */}
+          {/* Cover Letter Generator Toggle Button */}
           <button
             onClick={() => setShowCoverLetterModal(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 text-xs font-bold transition-all cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0"
             title="Generate Matching Cover Letter"
           >
             <FileSignature className="w-3.5 h-3.5" />
@@ -133,12 +121,12 @@ export default function Header({
           <div className="h-4 w-px bg-slate-800 hidden sm:block" />
 
           {/* Template Selector Dropdown */}
-          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
+          <div className="flex items-center gap-1 text-xs font-semibold text-slate-300 shrink-0">
             <LayoutTemplate className="w-3.5 h-3.5 text-red-500 shrink-0" />
             <select
               value={activeTemplate}
               onChange={(e) => setActiveTemplate(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-lg text-xs px-2 py-1 text-white font-medium focus:outline-none focus:border-red-500 cursor-pointer max-w-[120px] sm:max-w-none"
+              className="bg-slate-950 border border-slate-800 rounded-lg text-xs px-2 py-1 text-white font-medium focus:outline-none focus:border-red-500 cursor-pointer max-w-[100px] sm:max-w-none"
             >
               <option value="modern">Modern Slate</option>
               <option value="executive">Executive Classic</option>
@@ -168,10 +156,10 @@ export default function Header({
           <div className="h-4 w-px bg-slate-800 hidden md:block" />
 
           {/* Accent Color Dropdown */}
-          <div className="relative" ref={colorMenuRef}>
+          <div className="relative shrink-0" ref={colorMenuRef}>
             <button
               onClick={() => setShowColorMenu(!showColorMenu)}
-              className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-white border border-slate-800 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-white border border-slate-800 transition-all cursor-pointer"
               title="Accent Color Selection"
             >
               <Palette className="w-3.5 h-3.5 text-red-500 shrink-0" />
@@ -241,25 +229,20 @@ export default function Header({
           </div>
         </div>
 
-        {/* Action Buttons & Top-Right Save Progress & Log Out Button */}
-        <div className="flex items-center gap-2 relative">
+        {/* Action Buttons & Status Indicators */}
+        <div className="flex items-center gap-1.5 sm:gap-2 relative shrink-0">
           
-          {/* Prominent Save Progress Button */}
-          <button
-            onClick={onSaveResume}
-            disabled={isSaving}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition-all cursor-pointer shadow-lg shadow-emerald-600/30 disabled:opacity-50"
-            title="Save your resume progress permanently"
-          >
-            <Save className="w-3.5 h-3.5 text-white" />
-            <span>{isSaving ? 'Saving...' : 'Save Progress'}</span>
-          </button>
+          {/* Silent Live Auto-Save Pill Indicator */}
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-[11px] font-bold text-emerald-400 shadow-sm">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span>Auto-Saved</span>
+          </div>
 
           {/* Dynamic Theme Switcher */}
           <div className="relative" ref={themeMenuRef}>
             <button
               onClick={() => setShowThemeMenu(!showThemeMenu)}
-              className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+              className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 transition-colors cursor-pointer flex items-center gap-1 text-xs font-semibold"
               title="Theme Mode: Light / Dark / System Adaptive"
             >
               <ThemeIcon className="w-3.5 h-3.5 text-yellow-400" />
@@ -312,7 +295,7 @@ export default function Header({
 
           <button
             onClick={onLoadSample}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-200 border border-slate-800 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-200 border border-slate-800 transition-colors cursor-pointer"
             title="Populate with sample data"
           >
             <FileCheck className="w-3.5 h-3.5 text-yellow-400" />
@@ -321,7 +304,7 @@ export default function Header({
 
           <button
             onClick={onClear}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-800 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-800 transition-colors cursor-pointer"
             title="Reset form"
           >
             <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
@@ -330,22 +313,22 @@ export default function Header({
 
           <button
             onClick={() => setIsPreviewMode(!isPreviewMode)}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               isPreviewMode 
                 ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
                 : 'bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800'
             }`}
           >
             <Eye className="w-3.5 h-3.5" />
-            <span>{isPreviewMode ? 'Edit Mode' : 'Full Preview'}</span>
+            <span className="hidden sm:inline">{isPreviewMode ? 'Edit Mode' : 'Full Preview'}</span>
           </button>
 
-          {/* Streamlined 2-Option Download Button */}
+          {/* Download Dropdown Button */}
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowExportMenu(!showExportMenu)}
               disabled={isExporting}
-              className="flex items-center gap-1.5 px-3.5 py-1 rounded-lg bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 hover:from-red-500 hover:to-yellow-400 text-xs font-extrabold text-black shadow-lg shadow-red-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 hover:from-red-500 hover:to-yellow-400 text-xs font-extrabold text-black shadow-lg shadow-red-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer"
             >
               <Download className="w-3.5 h-3.5 text-black" />
               <span>Download</span>
@@ -393,11 +376,11 @@ export default function Header({
           {currentUser && (
             <button
               onClick={onLogout}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-950/80 hover:bg-red-600 text-white border border-red-500/50 text-xs font-extrabold transition-all cursor-pointer shadow-md ml-1"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-950/80 hover:bg-red-600 text-white border border-red-500/50 text-xs font-extrabold transition-all cursor-pointer shadow-md ml-0.5"
               title="Log out and return to Login Screen"
             >
               <User className="w-3.5 h-3.5 text-yellow-400" />
-              <span className="hidden sm:inline truncate max-w-[90px]">{currentUser.name}</span>
+              <span className="hidden md:inline truncate max-w-[80px]">{currentUser.name}</span>
               <LogOut className="w-3.5 h-3.5 text-white" />
             </button>
           )}
