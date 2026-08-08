@@ -4,9 +4,10 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: './', // Fixes GitHub Pages blank screen by using relative asset paths
   plugins: [react(), tailwindcss()],
   server: {
-    host: true, // Exposes server to network (http://<IP>:5173/)
+    host: true,
     port: 5173,
     proxy: {
       '/api': {
