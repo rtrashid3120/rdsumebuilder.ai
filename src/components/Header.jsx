@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Sun, Moon, Laptop, Check, Pipette, FileSignature, User, LogOut } from 'lucide-react';
+import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Sun, Moon, Laptop, Check, Pipette, FileSignature, User, LogOut, Save, CheckCircle2 } from 'lucide-react';
 import { exportAsDocx } from '../utils/exportHelpers';
 import ATSScoreMeter from './ATSScoreMeter';
 import CoverLetterModal from './CoverLetterModal';
@@ -22,7 +22,10 @@ export default function Header({
   themeMode,
   setThemeMode,
   currentUser,
-  onLogout
+  onLogout,
+  onSaveResume,
+  isSaving,
+  showSaveToast
 }) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
@@ -81,6 +84,15 @@ export default function Header({
 
   return (
     <header className="no-print sticky top-0 z-40 bg-slate-950/95 dark:bg-black/95 backdrop-blur-md border-b border-slate-800 text-white px-4 lg:px-8 py-2.5 shadow-2xl transition-all">
+      
+      {/* Toast Save Notification Banner */}
+      {showSaveToast && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 bg-emerald-950 border border-emerald-500 text-emerald-300 text-xs font-bold px-4 py-2 rounded-2xl shadow-2xl flex items-center gap-2 animate-fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400 animate-bounce" />
+          <span>💾 Resume Draft Saved Successfully! Your progress will be saved even after closing browser.</span>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         
         {/* Brand Executive Logo & Title */}
@@ -229,9 +241,20 @@ export default function Header({
           </div>
         </div>
 
-        {/* Action Buttons & Top-Right Log Out Button */}
+        {/* Action Buttons & Top-Right Save Progress & Log Out Button */}
         <div className="flex items-center gap-2 relative">
           
+          {/* Prominent Save Progress Button */}
+          <button
+            onClick={onSaveResume}
+            disabled={isSaving}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition-all cursor-pointer shadow-lg shadow-emerald-600/30 disabled:opacity-50"
+            title="Save your resume progress permanently"
+          >
+            <Save className="w-3.5 h-3.5 text-white" />
+            <span>{isSaving ? 'Saving...' : 'Save Progress'}</span>
+          </button>
+
           {/* Dynamic Theme Switcher */}
           <div className="relative" ref={themeMenuRef}>
             <button

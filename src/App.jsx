@@ -15,12 +15,23 @@ export default function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
-  const [resume, setResume] = useState(sampleResume);
+  // Persistent Draft State Initializer (Restores draft even after closing browser)
+  const [resume, setResume] = useState(() => {
+    try {
+      const savedDraft = localStorage.getItem('savedResumeDraft');
+      return savedDraft ? JSON.parse(savedDraft) : sampleResume;
+    } catch (e) {
+      return sampleResume;
+    }
+  });
+
   const [activeTemplate, setActiveTemplate] = useState('modern');
   const [accentColor, setAccentColor] = useState('#dc2626');
   const [activeFont, setActiveFont] = useState('sans');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSaveToast, setShowSaveToast] = useState(false);
   
   const [themeMode, setThemeMode] = useState('system');
 
@@ -38,6 +49,15 @@ export default function App() {
     originalText: '',
     jobTitle: ''
   });
+
+  // Auto-Save Draft to LocalStorage on Every Keystroke
+  useEffect(() => {
+    try {
+      localStorage.setItem('savedResumeDraft', JSON.stringify(resume));
+    } catch (e) {
+      console.error('LocalStorage write error:', e);
+    }
+  }, [resume]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -79,6 +99,35 @@ export default function App() {
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('resumeBuilderUser');
+  };
+
+  // Manual 1-Click Save Progress Handler
+  const handleSaveResume = async () => {
+    setIsSaving(true);
+    try {
+      // Local Save
+      localStorage.setItem('savedResumeDraft', JSON.stringify(resume));
+
+      // Cloud Save to MongoDB backend if user has account
+      if (currentUser?.email) {
+        await fetch('/api/resumes/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            email: currentUser.email, 
+            resumeData: resume,
+            template: activeTemplate,
+            accentColor
+          })
+        });
+      }
+    } catch (err) {
+      console.log('Local persistence saved automatically:', err.message);
+    } finally {
+      setIsSaving(false);
+      setShowSaveToast(true);
+      setTimeout(() => setShowSaveToast(false), 3500);
+    }
   };
 
   // Safe Deep Field Path Updater
@@ -198,7 +247,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[var(--bg-app)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-red-600 selection:text-white transition-colors duration-300">
       
-      {/* App Header Bar with Top-Right Log Out Button */}
+      {/* App Header Bar with Top-Right Log Out Button & Save Progress Button */}
       <Header
         onLoadSample={() => setResume(sampleResume)}
         onClear={() => setResume(emptyResume)}
@@ -217,6 +266,9 @@ export default function App() {
         setThemeMode={setThemeMode}
         currentUser={currentUser}
         onLogout={handleLogout}
+        onSaveResume={handleSaveResume}
+        isSaving={isSaving}
+        showSaveToast={showSaveToast}
       />
 
       {/* Main Workspace Container */}
