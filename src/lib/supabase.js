@@ -38,8 +38,8 @@ export async function fetchUserResumeFromSupabase(email) {
 export async function saveUserResumeToSupabase(email, resumeData, template, accentColor) {
   if (!email) return;
   try {
-    await fetch(
-      `${SUPABASE_URL}/rest/v1/resumes`,
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/resumes?on_conflict=email`,
       {
         method: 'POST',
         headers: {
