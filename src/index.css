@@ -1,10 +1,34 @@
 @import "tailwindcss";
 
 :root {
-  --accent-color: #ff3b30;
-  --accent-yellow: #ffcc00;
-  --bg-dark: #070a12;
-  --card-bg: #0f1524;
+  --accent-color: #dc2626;
+  --accent-yellow: #eab308;
+  --bg-app: #0f1524;
+  --bg-card: #161e33;
+  --bg-input: #090d16;
+  --border-color: #27344e;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+}
+
+/* Light Theme Variables */
+.theme-light {
+  --bg-app: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-input: #f8fafc;
+  --border-color: #cbd5e1;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+}
+
+/* Dark Theme Variables */
+.theme-dark {
+  --bg-app: #0f1524;
+  --bg-card: #161e33;
+  --bg-input: #090d16;
+  --border-color: #27344e;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
 }
 
 * {
@@ -12,11 +36,12 @@
 }
 
 body {
-  background-color: var(--bg-dark);
-  color: #f8fafc;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Custom Scrollbars */
@@ -28,13 +53,14 @@ body {
   scrollbar-width: none;
 }
 
-/* A4 Printable Canvas Dimensions - Responsive & Non-Clipping */
+/* A4 Printable Canvas Dimensions - Always Pure Printable White */
 .page-a4 {
   width: 100%;
   max-width: 800px;
   min-height: 1130px;
-  background-color: #ffffff;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 59, 48, 0.15);
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
@@ -47,15 +73,6 @@ body {
   }
 }
 
-/* Cyber Glow Effects */
-.glow-red {
-  box-shadow: 0 0 20px rgba(255, 59, 48, 0.35);
-}
-
-.glow-yellow {
-  box-shadow: 0 0 20px rgba(255, 204, 0, 0.35);
-}
-
 /* Smooth Animations */
 @keyframes spinSlow {
   from { transform: rotate(0deg); }
@@ -64,15 +81,6 @@ body {
 
 .animate-spin-slow {
   animation: spinSlow 8s linear infinite;
-}
-
-@keyframes pulseGlow {
-  0%, 100% { opacity: 0.8; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
-}
-
-.animate-pulse-glow {
-  animation: pulseGlow 3s ease-in-out infinite;
 }
 
 @keyframes fadeIn {

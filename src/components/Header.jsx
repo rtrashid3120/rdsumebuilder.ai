@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, FileCode, Database, FileSpreadsheet, Zap } from 'lucide-react';
+import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, FileCode, Database, FileSpreadsheet, Zap, Sun, Moon, Laptop } from 'lucide-react';
 import { exportAsPlainText, exportAsJSON, exportAsHTML, exportAsDocx } from '../utils/exportHelpers';
 
 export default function Header({ 
@@ -15,22 +15,28 @@ export default function Header({
   activeFont,
   setActiveFont,
   isExporting,
-  resume
+  resume,
+  themeMode,
+  setThemeMode
 }) {
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
   const menuRef = useRef(null);
+  const themeMenuRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setShowExportMenu(false);
       }
+      if (themeMenuRef.current && !themeMenuRef.current.contains(event.target)) {
+        setShowThemeMenu(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Red, Black, Yellow/Gold Palette Focus
   const colors = [
     { name: 'Crimson Red', value: '#dc2626' },
     { name: 'Neon Flame', value: '#ff2a55' },
@@ -48,11 +54,19 @@ export default function Header({
     { id: 'display', label: 'Outfit (Modern Display)' },
   ];
 
+  const themeIcons = {
+    dark: Moon,
+    light: Sun,
+    system: Laptop
+  };
+
+  const ThemeIcon = themeIcons[themeMode] || Laptop;
+
   return (
-    <header className="no-print sticky top-0 z-40 bg-black/95 backdrop-blur-md border-b border-red-950/60 text-white px-4 lg:px-8 py-3 shadow-2xl transition-all">
+    <header className="no-print sticky top-0 z-40 bg-slate-950/95 dark:bg-black/95 backdrop-blur-md border-b border-slate-800 text-white px-4 lg:px-8 py-3 shadow-2xl transition-all">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
         
-        {/* Brand Logo & Title with Red, Black & Yellow Theme */}
+        {/* Brand Logo & Title */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 via-amber-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-red-600/30 border border-yellow-400/40">
             <Zap className="w-5 h-5 text-black fill-black animate-pulse" />
@@ -67,12 +81,12 @@ export default function Header({
                 AI Active
               </span>
             </div>
-            <p className="text-xs text-slate-400 hidden sm:block">Smart Resume Builder • Red & Gold Edition</p>
+            <p className="text-xs text-slate-400 hidden sm:block">Smart Resume Builder • Adaptive UI Theme</p>
           </div>
         </div>
 
-        {/* Customization Toolbar - Red & Yellow Accent Styling */}
-        <div className="flex flex-wrap items-center gap-3 bg-slate-950/90 px-3.5 py-1.5 rounded-xl border border-red-900/40 shadow-inner">
+        {/* Customization Toolbar */}
+        <div className="flex flex-wrap items-center gap-3 bg-slate-900/90 px-3.5 py-1.5 rounded-xl border border-slate-800 shadow-inner">
           
           {/* Template Selector */}
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
@@ -81,7 +95,7 @@ export default function Header({
             <select
               value={activeTemplate}
               onChange={(e) => setActiveTemplate(e.target.value)}
-              className="bg-black border border-slate-800 rounded-lg text-xs px-2.5 py-1.5 text-white font-medium focus:outline-none focus:border-red-500 cursor-pointer"
+              className="bg-slate-950 border border-slate-800 rounded-lg text-xs px-2.5 py-1.5 text-white font-medium focus:outline-none focus:border-red-500 cursor-pointer"
             >
               <option value="modern">Modern Slate</option>
               <option value="executive">Executive Classic</option>
@@ -101,7 +115,7 @@ export default function Header({
             <select
               value={activeFont}
               onChange={(e) => setActiveFont(e.target.value)}
-              className="bg-black border border-slate-800 rounded-lg text-xs px-2.5 py-1.5 text-white font-medium focus:outline-none focus:border-yellow-400 cursor-pointer"
+              className="bg-slate-950 border border-slate-800 rounded-lg text-xs px-2.5 py-1.5 text-white font-medium focus:outline-none focus:border-yellow-400 cursor-pointer"
             >
               {fonts.map(f => (
                 <option key={f.id} value={f.id}>{f.label}</option>
@@ -143,8 +157,64 @@ export default function Header({
           </div>
         </div>
 
-        {/* Action Buttons - Red & Yellow High Contrast */}
-        <div className="flex items-center gap-2 relative" ref={menuRef}>
+        {/* Action Buttons & Theme Mode Switcher */}
+        <div className="flex items-center gap-2 relative">
+          
+          {/* Dynamic Light / Dark / System Theme Mode Dropdown */}
+          <div className="relative" ref={themeMenuRef}>
+            <button
+              onClick={() => setShowThemeMenu(!showThemeMenu)}
+              className="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 transition-colors cursor-pointer flex items-center gap-1.5 text-xs font-semibold"
+              title="Theme Mode: Light / Dark / System Adaptive"
+            >
+              <ThemeIcon className="w-4 h-4 text-yellow-400" />
+              <span className="hidden lg:inline capitalize">{themeMode}</span>
+            </button>
+
+            {showThemeMenu && (
+              <div className="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-50 animate-fade-in space-y-0.5">
+                <button
+                  onClick={() => {
+                    setThemeMode('system');
+                    setShowThemeMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                    themeMode === 'system' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                  }`}
+                >
+                  <Laptop className="w-4 h-4 text-yellow-400" />
+                  <span>💻 System Auto</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setThemeMode('dark');
+                    setShowThemeMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                    themeMode === 'dark' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                  }`}
+                >
+                  <Moon className="w-4 h-4 text-indigo-400" />
+                  <span>🌙 Dark Mode</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setThemeMode('light');
+                    setShowThemeMenu(false);
+                  }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                    themeMode === 'light' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                  }`}
+                >
+                  <Sun className="w-4 h-4 text-amber-400" />
+                  <span>☀️ Light Mode</span>
+                </button>
+              </div>
+            )}
+          </div>
+
           <button
             onClick={onLoadSample}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-200 border border-slate-800 transition-colors cursor-pointer"
@@ -175,8 +245,8 @@ export default function Header({
             <span>{isPreviewMode ? 'Edit Mode' : 'Full Preview'}</span>
           </button>
 
-          {/* Export Dropdown Button with Red/Yellow Gradient */}
-          <div className="relative">
+          {/* Export Dropdown Button */}
+          <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowExportMenu(!showExportMenu)}
               disabled={isExporting}
@@ -187,9 +257,8 @@ export default function Header({
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showExportMenu ? 'rotate-180' : ''}`} />
             </button>
 
-            {/* 5 Export Format Options Menu */}
             {showExportMenu && (
-              <div className="absolute right-0 mt-2 w-56 bg-black border border-red-900/60 rounded-xl shadow-2xl p-1.5 z-50 animate-fade-in space-y-0.5">
+              <div className="absolute right-0 mt-2 w-56 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1.5 z-50 animate-fade-in space-y-0.5 text-white">
                 <div className="px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-amber-400 border-b border-slate-800 mb-1">
                   Select Export Format:
                 </div>

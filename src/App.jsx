@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import FormSection from './components/FormSection';
 import ResumePreview from './components/ResumePreview';
@@ -10,12 +10,14 @@ import { Eye, Info } from 'lucide-react';
 export default function App() {
   const [resume, setResume] = useState(sampleResume);
   const [activeTemplate, setActiveTemplate] = useState('modern');
-  const [accentColor, setAccentColor] = useState('#4f46e5');
+  const [accentColor, setAccentColor] = useState('#dc2626');
   const [activeFont, setActiveFont] = useState('sans');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   
-  // Reorderable Section Order State (Default: Education ABOVE Experience)
+  // Dynamic Adaptive Theme Mode ('system' | 'dark' | 'light')
+  const [themeMode, setThemeMode] = useState('system');
+
   const [sectionOrder, setSectionOrder] = useState([
     'summary', 
     'education', 
@@ -24,7 +26,6 @@ export default function App() {
     'skills'
   ]);
 
-  // AI Modal State
   const [aiModalState, setAiModalState] = useState({
     isOpen: false,
     experienceIndex: null,
@@ -32,7 +33,40 @@ export default function App() {
     jobTitle: ''
   });
 
-  // Handle direct in-place editing on the resume preview canvas
+  // Dynamic Theme Effect - Listens to OS preference & user toggle
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const applyTheme = () => {
+      let activeIsDark = true;
+
+      if (themeMode === 'system') {
+        activeIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      } else {
+        activeIsDark = (themeMode === 'dark');
+      }
+
+      if (activeIsDark) {
+        root.classList.remove('theme-light');
+        root.classList.add('theme-dark');
+      } else {
+        root.classList.remove('theme-dark');
+        root.classList.add('theme-light');
+      }
+    };
+
+    applyTheme();
+
+    // Listen for OS system theme changes live
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemChange = () => {
+      if (themeMode === 'system') applyTheme();
+    };
+
+    mediaQuery.addEventListener('change', handleSystemChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemChange);
+  }, [themeMode]);
+
   const handleUpdateText = (fieldPath, newValue) => {
     const parts = fieldPath.split('.');
     const updated = JSON.parse(JSON.stringify(resume));
@@ -110,7 +144,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-[var(--bg-app)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-red-600 selection:text-white transition-colors duration-300">
       
       {/* App Header Bar */}
       <Header
@@ -127,6 +161,8 @@ export default function App() {
         setActiveFont={setActiveFont}
         isExporting={isExporting}
         resume={resume}
+        themeMode={themeMode}
+        setThemeMode={setThemeMode}
       />
 
       {/* Main Workspace Container */}
@@ -135,14 +171,14 @@ export default function App() {
         {/* Full Preview Mode View */}
         {isPreviewMode ? (
           <div className="flex flex-col items-center justify-center space-y-4">
-            <div className="no-print bg-slate-900/80 border border-slate-800 p-4 rounded-xl flex items-center justify-between w-full max-w-4xl">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-300">
-                <Info className="w-4 h-4 text-indigo-400" />
+            <div className="no-print bg-[var(--bg-card)] border border-[var(--border-color)] p-4 rounded-xl flex items-center justify-between w-full max-w-4xl shadow-lg">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[var(--text-primary)]">
+                <Info className="w-4 h-4 text-amber-400" />
                 <span>Full Preview & Direct In-Place Edit Mode — Click any text on the resume to edit directly</span>
               </div>
               <button
                 onClick={() => setIsPreviewMode(false)}
-                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow"
+                className="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-xs font-bold text-white shadow-md cursor-pointer"
               >
                 Back to Editor
               </button>
@@ -166,11 +202,10 @@ export default function App() {
             {/* Left Column: Interactive Forms */}
             <div className="lg:col-span-6 xl:col-span-5 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-indigo-500 animate-ping" />
+                <h2 className="text-xs font-extrabold uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-2">
                   Resume Form Editor
                 </h2>
-                <span className="text-xs text-slate-400">Live Auto-Syncing</span>
+                <span className="text-xs font-medium text-[var(--text-secondary)]">Live Auto-Syncing</span>
               </div>
 
               <FormSection
@@ -182,15 +217,15 @@ export default function App() {
               />
             </div>
 
-            {/* Right Column: Live A4 Canvas Preview (With Direct In-Place Click to Edit) */}
+            {/* Right Column: Live A4 Canvas Preview */}
             <div className="lg:col-span-6 xl:col-span-7 sticky top-24 space-y-4">
-              <div className="flex items-center justify-between bg-slate-900/60 p-3 rounded-xl border border-slate-800 text-xs text-slate-300">
+              <div className="flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-xl border border-[var(--border-color)] text-xs text-[var(--text-primary)] font-semibold shadow-md">
                 <span>✨ <strong>Direct Edit Mode</strong>: Click any text on the A4 resume to edit live</span>
-                <span className="capitalize text-indigo-400 font-semibold">{activeTemplate}</span>
+                <span className="capitalize text-yellow-400 font-bold">{activeTemplate}</span>
               </div>
 
               {/* A4 Canvas Container */}
-              <div className="w-full overflow-x-auto p-4 md:p-6 bg-slate-900/40 border border-slate-800/80 rounded-2xl shadow-2xl flex justify-center backdrop-blur-sm min-h-[700px]">
+              <div className="w-full overflow-x-auto p-4 md:p-6 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl flex justify-center backdrop-blur-sm min-h-[700px]">
                 <ResumePreview
                   resume={resume}
                   template={activeTemplate}
