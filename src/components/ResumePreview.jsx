@@ -1,5 +1,5 @@
 import React from 'react';
-import { Mail, Phone, MapPin, Globe } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Code2, Link as LinkIcon } from 'lucide-react';
 
 export default function ResumePreview({ 
   resume, 
@@ -25,12 +25,8 @@ export default function ResumePreview({
     onUpdateText(fieldPath, value);
   };
 
-  const getInitials = (name) => {
-    if (!name) return 'CV';
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-  };
-
   // Section Renderers
+  // Fix #2: Heading is explicitly "Profile Summary"
   const renderSummarySection = () => {
     if (!personalInfo.summary) return null;
     return (
@@ -39,7 +35,7 @@ export default function ResumePreview({
           className="text-xs font-extrabold uppercase tracking-widest pb-1 border-b"
           style={{ color: accentColor, borderColor: `${accentColor}33` }}
         >
-          Professional Profile
+          Profile Summary
         </h2>
         <p 
           contentEditable
@@ -323,6 +319,9 @@ export default function ResumePreview({
 
   // --------------------------------------------------------------------------
   // TEMPLATE LAYOUT 1: CREATIVE SPLIT (Two-Tone Sidebar)
+  // Fix #1 & Fix #3:
+  // - Added LinkedIn & GitHub links to left sidebar.
+  // - Placed EDUCATION ABOVE SKILLS in the left sidebar as requested!
   // --------------------------------------------------------------------------
   if (template === 'creative') {
     return (
@@ -333,40 +332,53 @@ export default function ResumePreview({
         <div className="grid grid-cols-12 min-h-full">
           {/* Left Colored Sidebar */}
           <div 
-            className="col-span-4 p-6 text-white space-y-6"
+            className="col-span-4 p-6 text-white space-y-5"
             style={{ backgroundColor: accentColor }}
           >
-            {/* Initials Avatar */}
-            <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl font-black text-white border border-white/30 shadow-inner">
-              {getInitials(personalInfo.fullName)}
-            </div>
-
-            <div>
+            {/* Avatar & Title */}
+            <div className="space-y-1">
               <h1 className="text-xl font-extrabold tracking-tight text-white leading-tight">
                 {personalInfo.fullName || 'Your Name'}
               </h1>
-              <p className="text-xs font-semibold text-white/80 uppercase tracking-wider mt-1">
+              <p className="text-xs font-semibold text-white/80 uppercase tracking-wider">
                 {personalInfo.jobTitle || 'Job Title'}
               </p>
             </div>
 
-            {/* Sidebar Contact Info */}
-            <div className="space-y-2 text-[11px] text-white/90 border-t border-white/20 pt-4">
-              {personalInfo.email && <div className="break-all">📧 {personalInfo.email}</div>}
+            {/* Fix #1: Complete Contact Details (Email, Phone, Location, Website, LinkedIn, GitHub) */}
+            <div className="space-y-2 text-[11px] text-white/95 border-t border-white/20 pt-4">
+              {personalInfo.email && <div className="break-all">✉️ {personalInfo.email}</div>}
               {personalInfo.phone && <div>📞 {personalInfo.phone}</div>}
               {personalInfo.location && <div>📍 {personalInfo.location}</div>}
               {personalInfo.website && <div className="break-all">🌐 {personalInfo.website}</div>}
+              {personalInfo.linkedin && <div className="break-all flex items-center gap-1"><LinkIcon className="w-3 h-3 shrink-0" /> {personalInfo.linkedin}</div>}
+              {personalInfo.github && <div className="break-all flex items-center gap-1"><Code2 className="w-3 h-3 shrink-0" /> {personalInfo.github}</div>}
             </div>
 
-            {/* Sidebar Skills */}
+            {/* Fix #3: EDUCATION placed ABOVE SKILLS in left sidebar */}
+            {education.length > 0 && (
+              <div className="space-y-2 border-t border-white/20 pt-4">
+                <h3 className="text-xs font-black uppercase tracking-wider text-white">Education</h3>
+                <div className="space-y-2 text-xs">
+                  {education.map((edu, idx) => (
+                    <div key={edu.id || idx} className="text-white/95">
+                      <p className="font-bold text-[11px] text-white">{edu.degree}</p>
+                      <p className="text-[10px] text-white/80">{edu.school} {edu.year ? `(${edu.year})` : ''}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* SKILLS placed below Education in left sidebar */}
             {skills.length > 0 && (
               <div className="space-y-2 border-t border-white/20 pt-4">
                 <h3 className="text-xs font-black uppercase tracking-wider text-white">Skills</h3>
                 <div className="space-y-1.5 text-xs">
                   {skills.map((s, idx) => (
                     <div key={idx} className="bg-white/10 px-2 py-1 rounded text-[11px] font-semibold flex justify-between">
-                      <span>{typeof s === 'string' ? s : s.name}</span>
-                      <span className="opacity-80">{typeof s === 'object' ? s.level : ''}</span>
+                      <span className="truncate mr-1">{typeof s === 'string' ? s : s.name}</span>
+                      <span className="opacity-80 shrink-0">{typeof s === 'object' ? s.level : ''}</span>
                     </div>
                   ))}
                 </div>
@@ -374,10 +386,10 @@ export default function ResumePreview({
             )}
           </div>
 
-          {/* Main Content Right Column */}
+          {/* Main Content Right Column (Profile Summary, Experience, Projects) */}
           <div className="col-span-8 p-8 space-y-6">
             {sectionOrder
-              .filter(sec => sec !== 'skills') // Skills shown in sidebar
+              .filter(sec => sec !== 'skills' && sec !== 'education') // Education & Skills in left sidebar
               .map(sectionKey => renderSection(sectionKey))}
           </div>
         </div>
@@ -386,7 +398,7 @@ export default function ResumePreview({
   }
 
   // --------------------------------------------------------------------------
-  // TEMPLATE LAYOUT 2: EXECUTIVE CLASSIC (Centered Double-Border)
+  // TEMPLATE LAYOUT 2: EXECUTIVE CLASSIC
   // --------------------------------------------------------------------------
   if (template === 'executive') {
     return (
@@ -395,18 +407,19 @@ export default function ResumePreview({
         className={`resume-preview-container page-a4 bg-white text-slate-900 shadow-2xl rounded-sm transition-all overflow-hidden ${fontClass}`}
       >
         <div className="p-8 md:p-10 space-y-6">
-          {/* Centered Classic Header */}
           <div className="text-center border-b-2 border-t-2 py-4 space-y-1" style={{ borderColor: accentColor }}>
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-widest">
               {personalInfo.fullName || 'Your Full Name'}
             </h1>
-            <p className="text-sm font-bold uppercase tracking-wider text-slate-600" style={{ color: accentColor }}>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-600" style={{ color: accentColor }}>
               {personalInfo.jobTitle || 'Professional Job Title'}
             </p>
-            <div className="flex flex-wrap justify-center gap-3 text-xs text-slate-600 pt-1 font-serif">
+            <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-slate-600 pt-1 font-serif">
               {personalInfo.email && <span>{personalInfo.email}</span>}
               {personalInfo.phone && <span>• {personalInfo.phone}</span>}
               {personalInfo.location && <span>• {personalInfo.location}</span>}
+              {personalInfo.linkedin && <span>• {personalInfo.linkedin}</span>}
+              {personalInfo.github && <span>• {personalInfo.github}</span>}
               {personalInfo.website && <span>• {personalInfo.website}</span>}
             </div>
           </div>
@@ -420,7 +433,7 @@ export default function ResumePreview({
   }
 
   // --------------------------------------------------------------------------
-  // TEMPLATE LAYOUT 3: TECH MINIMALIST (Clean Left Border Accents)
+  // TEMPLATE LAYOUT 3: TECH MINIMALIST
   // --------------------------------------------------------------------------
   if (template === 'minimal') {
     return (
@@ -436,10 +449,12 @@ export default function ResumePreview({
             <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
               {personalInfo.jobTitle || 'Professional Job Title'}
             </p>
-            <div className="flex flex-wrap gap-4 text-xs text-slate-600 pt-1">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 pt-1">
               {personalInfo.email && <span>{personalInfo.email}</span>}
               {personalInfo.phone && <span>{personalInfo.phone}</span>}
               {personalInfo.location && <span>{personalInfo.location}</span>}
+              {personalInfo.linkedin && <span>{personalInfo.linkedin}</span>}
+              {personalInfo.github && <span>{personalInfo.github}</span>}
             </div>
           </div>
 
@@ -452,7 +467,7 @@ export default function ResumePreview({
   }
 
   // --------------------------------------------------------------------------
-  // TEMPLATE LAYOUT 4: ELEGANT LUXE SERIF (Classy Crest Header)
+  // TEMPLATE LAYOUT 4: ELEGANT LUXE SERIF
   // --------------------------------------------------------------------------
   if (template === 'elegant') {
     return (
@@ -462,22 +477,18 @@ export default function ResumePreview({
       >
         <div className="p-8 md:p-10 space-y-6">
           <div className="text-center space-y-2 border-b pb-4" style={{ borderColor: `${accentColor}44` }}>
-            <div 
-              className="w-12 h-12 rounded-full mx-auto flex items-center justify-center text-sm font-black text-white shadow-md"
-              style={{ backgroundColor: accentColor }}
-            >
-              {getInitials(personalInfo.fullName)}
-            </div>
             <h1 className="text-2xl font-bold tracking-wide text-slate-900">
               {personalInfo.fullName || 'Your Full Name'}
             </h1>
             <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentColor }}>
               {personalInfo.jobTitle || 'Professional Job Title'}
             </p>
-            <div className="flex flex-wrap justify-center gap-3 text-xs text-slate-600">
+            <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-slate-600">
               {personalInfo.email && <span>{personalInfo.email}</span>}
               {personalInfo.phone && <span>| {personalInfo.phone}</span>}
               {personalInfo.location && <span>| {personalInfo.location}</span>}
+              {personalInfo.linkedin && <span>| {personalInfo.linkedin}</span>}
+              {personalInfo.github && <span>| {personalInfo.github}</span>}
             </div>
           </div>
 
@@ -498,7 +509,7 @@ export default function ResumePreview({
       className={`resume-preview-container page-a4 bg-white text-slate-900 shadow-2xl rounded-sm transition-all overflow-hidden ${fontClass}`}
     >
       <div className="p-8 md:p-10 space-y-6 text-slate-800 leading-relaxed">
-        {/* Modern Top Header */}
+        {/* Fix #1: Header with LinkedIn & GitHub Links */}
         <div className="border-b-2 pb-4" style={{ borderColor: accentColor }}>
           <h1 
             contentEditable
@@ -535,6 +546,18 @@ export default function ResumePreview({
               <span className="flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
                 <span>{personalInfo.location}</span>
+              </span>
+            )}
+            {personalInfo.linkedin && (
+              <span className="flex items-center gap-1">
+                <LinkIcon className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
+                <span>{personalInfo.linkedin}</span>
+              </span>
+            )}
+            {personalInfo.github && (
+              <span className="flex items-center gap-1">
+                <Code2 className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
+                <span>{personalInfo.github}</span>
               </span>
             )}
             {personalInfo.website && (
