@@ -53,17 +53,24 @@ body {
   scrollbar-width: none;
 }
 
-/* A4 Printable Canvas Dimensions - Always Pure Printable White */
-.page-a4 {
+/* A4 Printable Canvas Dimensions - Pure Hex Colors to Prevent html2canvas oklch crash */
+.page-a4, #printable-resume, #printable-cover-letter {
   width: 100%;
   max-width: 800px;
   min-height: 1130px;
   background-color: #ffffff !important;
   color: #0f172a !important;
+  border-color: #e2e8f0 !important;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
+}
+
+/* Explicit RGB/Hex Overrides inside printable canvases to prevent html2canvas OKLCH parsing error */
+#printable-resume *, #printable-cover-letter * {
+  color: inherit;
+  border-color: inherit;
 }
 
 @media (min-width: 1024px) {
@@ -101,7 +108,6 @@ body {
     margin: 0 !important;
   }
 
-  /* Hide header, form editor, toolbar, overlays, and everything else */
   header, 
   .no-print, 
   .lg\:col-span-5, 
@@ -111,7 +117,6 @@ body {
     display: none !important;
   }
 
-  /* Show ONLY printable resume container */
   #printable-resume, #printable-cover-letter {
     display: block !important;
     visibility: visible !important;
