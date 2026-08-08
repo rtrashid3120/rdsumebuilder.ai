@@ -9,7 +9,7 @@ export default function ResumePreview({
   sectionOrder = ['summary', 'education', 'experience', 'projects', 'skills'],
   onUpdateText
 }) {
-  const { personalInfo = {}, experience = [], education = [], skills = [], projects = [] } = resume;
+  const { personalInfo = {}, experience = [], education = [], skills = [], projects = [], customSections = [] } = resume;
 
   const fontClasses = {
     sans: 'font-sans',
@@ -56,7 +56,7 @@ export default function ResumePreview({
     return (
       <div key="education" className="space-y-2">
         <h2 
-          className="text-xs font-bold uppercase tracking-widest pb-1 mb-2 border-b border-slate-200"
+          className="text-xs font-bold uppercase tracking-widest pb-1 border-b border-slate-200"
           style={{ color: accentColor }}
         >
           Education
@@ -258,13 +258,70 @@ export default function ResumePreview({
     );
   };
 
-  // Section Order Map
-  const sectionRenderers = {
-    summary: renderSummarySection,
-    education: renderEducationSection,
-    experience: renderExperienceSection,
-    projects: renderProjectsSection,
-    skills: renderSkillsSection
+  // Feature #7: Render Custom Section Dynamically by ID
+  const renderCustomSection = (secId) => {
+    const customSec = customSections.find(c => c.id === secId);
+    if (!customSec || !customSec.items || customSec.items.length === 0) return null;
+
+    return (
+      <div key={secId} className="space-y-2">
+        <h2 
+          className="text-xs font-bold uppercase tracking-widest pb-1 border-b border-slate-200"
+          style={{ color: accentColor }}
+        >
+          {customSec.title}
+        </h2>
+
+        {/* Item List Layout */}
+        {customSec.type === 'itemList' && (
+          <div className="space-y-3">
+            {customSec.items.map((item, idx) => (
+              <div key={item.id || idx}>
+                <div className="flex items-baseline justify-between">
+                  <h3 className="text-xs font-bold text-slate-900">
+                    {item.title} {item.subtitle ? <span className="font-normal text-slate-500">| {item.subtitle}</span> : ''}
+                  </h3>
+                  {item.date && <span className="text-[11px] font-semibold text-slate-500">{item.date}</span>}
+                </div>
+                {item.description && <p className="text-xs text-slate-700 mt-0.5">{item.description}</p>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Badge Grid Layout */}
+        {customSec.type === 'badgeGrid' && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
+            {customSec.items.map((item, idx) => (
+              <div key={item.id || idx} className="flex items-center justify-between border-b border-slate-100 pb-1">
+                <span className="font-semibold text-slate-800">{item.title}</span>
+                {item.subtitle && <span className="text-[10px] text-slate-500 font-medium">{item.subtitle}</span>}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Bullet List Layout */}
+        {customSec.type === 'bulletList' && (
+          <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
+            {customSec.items.map((item, idx) => (
+              <li key={item.id || idx}>{item.title}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  };
+
+  // Section Renderers Registry
+  const renderSection = (secKey) => {
+    if (secKey === 'summary') return renderSummarySection();
+    if (secKey === 'education') return renderEducationSection();
+    if (secKey === 'experience') return renderExperienceSection();
+    if (secKey === 'projects') return renderProjectsSection();
+    if (secKey === 'skills') return renderSkillsSection();
+    if (secKey.startsWith('custom-sec-')) return renderCustomSection(secKey);
+    return null;
   };
 
   return (
@@ -273,128 +330,89 @@ export default function ResumePreview({
       className={`resume-preview-container page-a4 bg-white text-slate-900 shadow-2xl rounded-sm transition-all overflow-hidden ${fontClass} template-${template}`}
       style={{ '--accent-color': accentColor }}
     >
-      {/* ==================== TEMPLATE 1: MODERN SLATE ==================== */}
-      {template === 'modern' && (
-        <div className="p-8 md:p-10 space-y-6 text-slate-800 leading-relaxed">
-          {/* Header */}
-          <div className="border-b-2 pb-4" style={{ borderColor: accentColor }}>
-            <h1 
-              contentEditable
-              suppressContentEditableWarning
-              onBlur={(e) => handleBlur('personalInfo.fullName', e)}
-              className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-1 break-words focus:outline-none focus:bg-indigo-50/50 p-1 rounded"
-            >
-              {personalInfo.fullName || 'Your Full Name'}
-            </h1>
-            <p 
-              contentEditable
-              suppressContentEditableWarning
-              onBlur={(e) => handleBlur('personalInfo.jobTitle', e)}
-              className="text-sm md:text-base font-semibold uppercase tracking-wider mb-3 focus:outline-none focus:bg-indigo-50/50 p-1 rounded" 
-              style={{ color: accentColor }}
-            >
-              {personalInfo.jobTitle || 'Professional Job Title'}
-            </p>
-            
-            {/* Contact Details */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-600">
-              {personalInfo.email && (
-                <span className="flex items-center gap-1">
-                  <Mail className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
-                  <span
-                    contentEditable
-                    suppressContentEditableWarning
-                    onBlur={(e) => handleBlur('personalInfo.email', e)}
-                    className="break-all focus:outline-none focus:bg-indigo-50/50 p-0.5 rounded"
-                  >
-                    {personalInfo.email}
-                  </span>
+      <div className="p-8 md:p-10 space-y-6 text-slate-800 leading-relaxed">
+        {/* Header */}
+        <div className="border-b-2 pb-4" style={{ borderColor: accentColor }}>
+          <h1 
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => handleBlur('personalInfo.fullName', e)}
+            className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-1 break-words focus:outline-none focus:bg-indigo-50/50 p-1 rounded"
+          >
+            {personalInfo.fullName || 'Your Full Name'}
+          </h1>
+          <p 
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={(e) => handleBlur('personalInfo.jobTitle', e)}
+            className="text-sm md:text-base font-semibold uppercase tracking-wider mb-3 focus:outline-none focus:bg-indigo-50/50 p-1 rounded" 
+            style={{ color: accentColor }}
+          >
+            {personalInfo.jobTitle || 'Professional Job Title'}
+          </p>
+          
+          {/* Contact Details */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-slate-600">
+            {personalInfo.email && (
+              <span className="flex items-center gap-1">
+                <Mail className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
+                <span
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleBlur('personalInfo.email', e)}
+                  className="break-all focus:outline-none focus:bg-indigo-50/50 p-0.5 rounded"
+                >
+                  {personalInfo.email}
                 </span>
-              )}
-              {personalInfo.phone && (
-                <span className="flex items-center gap-1">
-                  <Phone className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
-                  <span
-                    contentEditable
-                    suppressContentEditableWarning
-                    onBlur={(e) => handleBlur('personalInfo.phone', e)}
-                    className="focus:outline-none focus:bg-indigo-50/50 p-0.5 rounded"
-                  >
-                    {personalInfo.phone}
-                  </span>
+              </span>
+            )}
+            {personalInfo.phone && (
+              <span className="flex items-center gap-1">
+                <Phone className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
+                <span
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleBlur('personalInfo.phone', e)}
+                  className="focus:outline-none focus:bg-indigo-50/50 p-0.5 rounded"
+                >
+                  {personalInfo.phone}
                 </span>
-              )}
-              {personalInfo.location && (
-                <span className="flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
-                  <span
-                    contentEditable
-                    suppressContentEditableWarning
-                    onBlur={(e) => handleBlur('personalInfo.location', e)}
-                    className="focus:outline-none focus:bg-indigo-50/50 p-0.5 rounded"
-                  >
-                    {personalInfo.location}
-                  </span>
+              </span>
+            )}
+            {personalInfo.location && (
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
+                <span
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleBlur('personalInfo.location', e)}
+                  className="focus:outline-none focus:bg-indigo-50/50 p-0.5 rounded"
+                >
+                  {personalInfo.location}
                 </span>
-              )}
-              {personalInfo.website && (
-                <span className="flex items-center gap-1">
-                  <Globe className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
-                  <span
-                    contentEditable
-                    suppressContentEditableWarning
-                    onBlur={(e) => handleBlur('personalInfo.website', e)}
-                    className="focus:outline-none focus:bg-indigo-50/50 p-0.5 rounded"
-                  >
-                    {personalInfo.website}
-                  </span>
+              </span>
+            )}
+            {personalInfo.website && (
+              <span className="flex items-center gap-1">
+                <Globe className="w-3.5 h-3.5 shrink-0" style={{ color: accentColor }} />
+                <span
+                  contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) => handleBlur('personalInfo.website', e)}
+                  className="focus:outline-none focus:bg-indigo-50/50 p-0.5 rounded"
+                >
+                  {personalInfo.website}
                 </span>
-              )}
-            </div>
-          </div>
-
-          {/* Dynamic Reorderable Sections (Default: Education above Experience) */}
-          <div className="space-y-6">
-            {sectionOrder.map((sectionKey) => {
-              const renderer = sectionRenderers[sectionKey];
-              return renderer ? renderer() : null;
-            })}
+              </span>
+            )}
           </div>
         </div>
-      )}
 
-      {/* Other templates (Executive, Minimal, Creative, Compact, Elegant) fallback rendering */}
-      {template !== 'modern' && (
-        <div className="p-8 md:p-10 space-y-6 text-slate-800 leading-relaxed">
-          <div className="border-b-2 pb-4" style={{ borderColor: accentColor }}>
-            <h1 
-              contentEditable
-              suppressContentEditableWarning
-              onBlur={(e) => handleBlur('personalInfo.fullName', e)}
-              className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-1 focus:outline-none"
-            >
-              {personalInfo.fullName}
-            </h1>
-            <p 
-              contentEditable
-              suppressContentEditableWarning
-              onBlur={(e) => handleBlur('personalInfo.jobTitle', e)}
-              className="text-sm font-semibold uppercase tracking-wider mb-2 focus:outline-none" 
-              style={{ color: accentColor }}
-            >
-              {personalInfo.jobTitle}
-            </p>
-            <p className="text-xs text-slate-600">{personalInfo.email} • {personalInfo.phone} • {personalInfo.location}</p>
-          </div>
-
-          <div className="space-y-6">
-            {sectionOrder.map((sectionKey) => {
-              const renderer = sectionRenderers[sectionKey];
-              return renderer ? renderer() : null;
-            })}
-          </div>
+        {/* Dynamic Reorderable Sections (Includes Custom Sections) */}
+        <div className="space-y-6">
+          {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
         </div>
-      )}
+      </div>
     </div>
   );
 }

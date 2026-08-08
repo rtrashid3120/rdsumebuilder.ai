@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { User, Briefcase, GraduationCap, Wrench, FolderGit2, ArrowUp, ArrowDown, Sparkles, SlidersHorizontal, GripVertical } from 'lucide-react';
+import { User, Briefcase, GraduationCap, Wrench, FolderGit2, ArrowUp, ArrowDown, Sparkles, SlidersHorizontal, GripVertical, Layers } from 'lucide-react';
 import PersonalInfoForm from './PersonalInfoForm';
 import ExperienceForm from './ExperienceForm';
 import EducationForm from './EducationForm';
 import SkillsForm from './SkillsForm';
 import ProjectsForm from './ProjectsForm';
+import CustomSectionsForm from './CustomSectionsForm';
 
 export default function FormSection({ 
   resume, 
@@ -23,17 +24,28 @@ export default function FormSection({
     { id: 'experience', label: 'Experience', icon: Briefcase, count: resume.experience?.length || 0, badge: 'AI Ready' },
     { id: 'skills', label: 'Skills', icon: Wrench, count: resume.skills?.length || 0 },
     { id: 'projects', label: 'Projects', icon: FolderGit2, count: resume.projects?.length || 0 },
+    { id: 'custom', label: 'Custom Sections', icon: Layers, count: resume.customSections?.length || 0 },
   ];
 
-  const sectionLabels = {
-    summary: 'Professional Profile Summary',
-    education: 'Education',
-    experience: 'Work Experience',
-    projects: 'Key Projects',
-    skills: 'Skills & Expertise'
+  // Dynamic section labels map including custom sections
+  const getSectionLabel = (secKey) => {
+    const builtInLabels = {
+      summary: 'Professional Profile Summary',
+      education: 'Education',
+      experience: 'Work Experience',
+      projects: 'Key Projects',
+      skills: 'Skills & Expertise'
+    };
+
+    if (builtInLabels[secKey]) return builtInLabels[secKey];
+    
+    // Lookup in custom sections
+    const foundCustom = resume.customSections?.find(c => c.id === secKey);
+    if (foundCustom) return `➕ ${foundCustom.title}`;
+    
+    return secKey;
   };
 
-  // Move section position up or down
   const moveSection = (index, direction) => {
     const newOrder = [...sectionOrder];
     const targetIndex = direction === 'up' ? index - 1 : index + 1;
@@ -48,16 +60,13 @@ export default function FormSection({
     }
   };
 
-  // HTML5 Drag & Drop Handlers
   const handleDragStart = (e, index) => {
     setDraggedIndex(index);
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', e.target.parentNode);
   };
 
   const handleDragOver = (e, index) => {
     e.preventDefault();
-    if (draggedIndex === null || draggedIndex === index) return;
   };
 
   const handleDrop = (e, targetIndex) => {
@@ -67,9 +76,7 @@ export default function FormSection({
     const newOrder = [...sectionOrder];
     const draggedItem = newOrder[draggedIndex];
 
-    // Remove item from original position
     newOrder.splice(draggedIndex, 1);
-    // Insert item at target position
     newOrder.splice(targetIndex, 0, draggedItem);
 
     setDraggedIndex(null);
@@ -136,7 +143,7 @@ export default function FormSection({
         <div className="bg-slate-950 border-b border-slate-800 p-4 space-y-2 animate-fade-in">
           <div className="flex items-center justify-between text-xs font-bold text-slate-300 mb-2">
             <span>📋 Drag & Drop or use arrows to rearrange sections on preview:</span>
-            <span className="text-[11px] text-indigo-400 font-normal">Education is above Experience by default</span>
+            <span className="text-[11px] text-indigo-400 font-normal">Includes custom sections</span>
           </div>
 
           <div className="space-y-2">
@@ -158,7 +165,7 @@ export default function FormSection({
                   <span className="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] font-bold">
                     {index + 1}
                   </span>
-                  <span>{sectionLabels[secKey] || secKey}</span>
+                  <span>{getSectionLabel(secKey)}</span>
                 </div>
 
                 <div className="flex items-center gap-1">
@@ -194,18 +201,18 @@ export default function FormSection({
           />
         )}
 
+        {activeTab === 'education' && (
+          <EducationForm
+            education={resume.education}
+            onChange={(education) => onChange({ ...resume, education })}
+          />
+        )}
+
         {activeTab === 'experience' && (
           <ExperienceForm
             experiences={resume.experience}
             onChange={(experience) => onChange({ ...resume, experience })}
             onOpenAIModal={onOpenAIModal}
-          />
-        )}
-
-        {activeTab === 'education' && (
-          <EducationForm
-            education={resume.education}
-            onChange={(education) => onChange({ ...resume, education })}
           />
         )}
 
@@ -220,6 +227,22 @@ export default function FormSection({
           <ProjectsForm
             projects={resume.projects}
             onChange={(projects) => onChange({ ...resume, projects })}
+          />
+        )}
+
+        {activeTab === 'custom' && (
+          <CustomSectionsForm
+            customSections={resume.customSections || []}
+            onChange={(customSections) => {
+              // Ensure newly added custom section IDs are appended to sectionOrder if missing
+              const newSecIds = customSections.map(c => c.id);
+              const missingIds = newSecIds.filter(id => !sectionOrder.includes(id));
+              if (missingIds.length > 0 && onUpdateSectionOrder) {
+                onUpdateSectionOrder([...sectionOrder, ...missingIds]);
+              }
+              onChange({ ...resume, customSections });
+            }}
+            onOpenAIModal={onOpenAIModal}
           />
         )}
       </div>

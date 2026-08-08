@@ -73,6 +73,31 @@ export const sampleResume = {
       description: "Open-source developer metrics dashboard tracking repository commit velocity and PR review cycles in real-time.",
       techStack: "TypeScript, React, Recharts, Websockets"
     }
+  ],
+  customSections: [
+    {
+      id: "custom-sec-certifications",
+      title: "Certifications & Licenses",
+      type: "itemList",
+      items: [
+        {
+          id: "cert-1",
+          title: "AWS Certified Solutions Architect – Associate",
+          subtitle: "Amazon Web Services",
+          date: "Dec 2024",
+          description: "Credential ID: AWS-892347. Distributed cloud system architecture & security."
+        }
+      ]
+    },
+    {
+      id: "custom-sec-languages",
+      title: "Languages Spoken",
+      type: "badgeGrid",
+      items: [
+        { id: "lang-1", title: "English", subtitle: "Native / Fluent" },
+        { id: "lang-2", title: "Spanish", subtitle: "Professional Working" }
+      ]
+    }
   ]
 };
 
@@ -88,27 +113,9 @@ export const emptyResume = {
     github: "",
     summary: ""
   },
-  experience: [
-    {
-      id: "exp-1",
-      title: "",
-      company: "",
-      location: "",
-      startDate: "",
-      description: "",
-      aiSuggestion: ""
-    }
-  ],
-  education: [
-    {
-      id: "edu-1",
-      degree: "",
-      school: "",
-      location: "",
-      year: "",
-      gpa: ""
-    }
-  ],
+  experience: [],
+  education: [],
   skills: [],
-  projects: []
+  projects: [],
+  customSections: []
 };
