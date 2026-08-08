@@ -1,6 +1,6 @@
 // Supabase OAuth Auth & REST Data Sync Helpers for ResumeBuilder.ai
 export const SUPABASE_URL = 'https://tvsijqhfqivaiodkokpf.supabase.co';
-export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
+export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2c2lqcWhmcWl2YWlvZGtva3BmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyMTM5MTksImV4cCI6MjEwMTc4OTkxOX0.-eRivSoYyhEztVXWV5Ekwp7ZLDf3RLOllfRlgCDR4KE';
 
 export function signInWithGoogleSupabase() {
   const redirectUrl = encodeURIComponent(window.location.origin);
@@ -27,6 +27,9 @@ export async function fetchUserResumeFromSupabase(email) {
       if (data && data.length > 0) {
         return data[0].resume_data;
       }
+    } else {
+      const errText = await res.text();
+      console.error('Supabase fetch error:', res.status, errText);
     }
   } catch (err) {
     console.error('Failed to fetch resume from Supabase:', err);
@@ -57,6 +60,10 @@ export async function saveUserResumeToSupabase(email, resumeData, template, acce
         })
       }
     );
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error('Supabase save error:', res.status, errText);
+    }
   } catch (err) {
     console.error('Failed to save resume to Supabase:', err);
   }
