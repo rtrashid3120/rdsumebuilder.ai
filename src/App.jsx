@@ -23,13 +23,6 @@ export default function App() {
       const savedUser = localStorage.getItem('resumeBuilderUser');
       const email = savedUser ? JSON.parse(savedUser).email : 'guest';
       const savedDraft = localStorage.getItem(`savedResumeDraft_${email}`);
-      
-      // Also check the old generic key if no user-specific draft exists yet
-      if (!savedDraft) {
-        const legacyDraft = localStorage.getItem('savedResumeDraft');
-        if (legacyDraft) return JSON.parse(legacyDraft);
-      }
-      
       return savedDraft ? JSON.parse(savedDraft) : sampleResume;
     } catch (e) {
       return sampleResume;
@@ -121,6 +114,7 @@ export default function App() {
   const handleLogout = () => {
     setCurrentUser(null);
     localStorage.removeItem('resumeBuilderUser');
+    setResume(sampleResume); // Clear in-memory resume state on logout
   };
 
   // Switch the loaded resume draft when a new user logs in (Supabase Cloud + Local Storage fallback)
@@ -134,13 +128,12 @@ export default function App() {
           setResume(cloudResume);
           localStorage.setItem(`savedResumeDraft_${email}`, JSON.stringify(cloudResume));
         } else {
-          // 2. Fallback to Local Storage draft if cloud copy doesn't exist yet
+          // 2. Fallback to user-specific Local Storage draft, or sample resume if brand new account
           const savedDraft = localStorage.getItem(`savedResumeDraft_${email}`);
           if (savedDraft) {
             setResume(JSON.parse(savedDraft));
           } else {
-            const legacyDraft = localStorage.getItem('savedResumeDraft');
-            setResume(legacyDraft ? JSON.parse(legacyDraft) : sampleResume);
+            setResume(sampleResume);
           }
         }
       });
