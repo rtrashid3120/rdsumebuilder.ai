@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --accent-color: #4f46e5;
-  --bg-dark: #090d16;
+  --accent-color: #ff3b30;
+  --accent-yellow: #ffcc00;
+  --bg-dark: #070a12;
+  --card-bg: #0f1524;
 }
 
 * {
@@ -26,13 +28,13 @@ body {
   scrollbar-width: none;
 }
 
-/* Perfect A4 Canvas Proportions - Fully Responsive & Scaled */
+/* A4 Printable Canvas Dimensions - Responsive & Non-Clipping */
 .page-a4 {
   width: 100%;
   max-width: 800px;
   min-height: 1130px;
   background-color: #ffffff;
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 30px rgba(255, 59, 48, 0.15);
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
@@ -45,6 +47,15 @@ body {
   }
 }
 
+/* Cyber Glow Effects */
+.glow-red {
+  box-shadow: 0 0 20px rgba(255, 59, 48, 0.35);
+}
+
+.glow-yellow {
+  box-shadow: 0 0 20px rgba(255, 204, 0, 0.35);
+}
+
 /* Smooth Animations */
 @keyframes spinSlow {
   from { transform: rotate(0deg); }
@@ -53,6 +64,15 @@ body {
 
 .animate-spin-slow {
   animation: spinSlow 8s linear infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
 }
 
 @keyframes fadeIn {

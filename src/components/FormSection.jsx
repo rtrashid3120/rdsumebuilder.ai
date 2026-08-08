@@ -19,7 +19,6 @@ export default function FormSection({
   const [draggedIndex, setDraggedIndex] = useState(null);
   const orderManagerRef = useRef(null);
 
-  // Fix Item 2: Click-outside listener so clicking anywhere outside auto-closes the Reorder panel!
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (orderManagerRef.current && !orderManagerRef.current.contains(event.target)) {
@@ -101,17 +100,16 @@ export default function FormSection({
     }
   };
 
-  // Switch tab and auto-close order manager
   const handleTabClick = (tabId) => {
     setActiveTab(tabId);
     setShowOrderManager(false);
   };
 
   return (
-    <div className="bg-slate-900/80 border border-slate-800 rounded-2xl shadow-xl overflow-hidden backdrop-blur-md space-y-0 relative">
+    <div className="bg-black/80 border border-slate-900 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md space-y-0 relative">
       
-      {/* Navigation Tabs */}
-      <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 overflow-x-auto no-scrollbar">
+      {/* Navigation Tabs - Red & Yellow High Impact Style */}
+      <div className="flex items-center justify-between border-b border-slate-900 bg-slate-950/80 overflow-x-auto no-scrollbar">
         <div className="flex">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -120,25 +118,25 @@ export default function FormSection({
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3.5 text-xs font-semibold whitespace-nowrap border-b-2 transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-4 py-3.5 text-xs font-bold whitespace-nowrap border-b-2 transition-all cursor-pointer ${
                   isActive
-                    ? 'border-indigo-500 text-indigo-400 bg-indigo-500/10'
+                    ? 'border-red-500 text-red-500 bg-red-950/30'
                     : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-indigo-400' : 'text-slate-500'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-red-500' : 'text-slate-500'}`} />
                 <span>{tab.label}</span>
                 
                 {tab.badge && (
-                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.2 rounded bg-amber-400/10 text-amber-300 border border-amber-400/20">
-                    <Sparkles className="w-2.5 h-2.5" />
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-black px-1.5 py-0.2 rounded bg-yellow-400/20 text-yellow-400 border border-yellow-400/30">
+                    <Sparkles className="w-2.5 h-2.5 text-yellow-400" />
                     {tab.badge}
                   </span>
                 )}
 
                 {tab.count !== null && (
-                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                    isActive ? 'bg-indigo-500/20 text-indigo-300' : 'bg-slate-800 text-slate-400'
+                  <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                    isActive ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-400'
                   }`}>
                     {tab.count}
                   </span>
@@ -148,13 +146,13 @@ export default function FormSection({
           })}
         </div>
 
-        {/* Section Reorder Toggle Button */}
+        {/* Section Reorder Button */}
         <button
           onClick={() => setShowOrderManager(!showOrderManager)}
-          className={`px-3 py-2 mr-2 rounded-lg text-xs font-semibold border flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer ${
+          className={`px-3 py-2 mr-2 rounded-lg text-xs font-bold border flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer ${
             showOrderManager 
-              ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-500/20' 
-              : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+              ? 'bg-red-600 text-white border-red-500 shadow-md shadow-red-600/30' 
+              : 'bg-red-950/30 hover:bg-red-950/50 text-red-400 border border-red-900/40'
           }`}
           title="Reorder Resume Sections"
         >
@@ -163,14 +161,14 @@ export default function FormSection({
         </button>
       </div>
 
-      {/* Item 2 Fix: Auto-Dismissing Section Order Manager Popup */}
+      {/* Auto-Dismissing Section Order Manager Popup */}
       {showOrderManager && (
         <div 
           ref={orderManagerRef}
-          className="bg-slate-950 border-b border-slate-800 p-4 space-y-2 animate-fade-in shadow-2xl z-30"
+          className="bg-black border-b border-red-950/60 p-4 space-y-2 animate-fade-in shadow-2xl z-30"
         >
           <div className="flex items-center justify-between text-xs font-bold text-slate-300 mb-2">
-            <span className="flex items-center gap-1.5 text-indigo-300">
+            <span className="flex items-center gap-1.5 text-yellow-400 font-extrabold">
               📋 Drag & Drop or use arrows to rearrange sections on preview:
             </span>
             <button 
@@ -189,15 +187,15 @@ export default function FormSection({
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={(e) => handleDragOver(e, index)}
                 onDrop={(e) => handleDrop(e, index)}
-                className={`flex items-center justify-between bg-slate-900 border px-3 py-2.5 rounded-xl text-xs text-slate-200 transition-all cursor-grab active:cursor-grabbing ${
+                className={`flex items-center justify-between bg-slate-950 border px-3 py-2.5 rounded-xl text-xs text-slate-200 transition-all cursor-grab active:cursor-grabbing ${
                   draggedIndex === index 
-                    ? 'border-indigo-500 bg-indigo-500/10 shadow-lg scale-[0.99]' 
-                    : 'border-slate-800 hover:border-indigo-500/40'
+                    ? 'border-red-500 bg-red-950/40 shadow-lg scale-[0.99]' 
+                    : 'border-slate-900 hover:border-red-900/50'
                 }`}
               >
-                <div className="flex items-center gap-2.5 font-semibold">
+                <div className="flex items-center gap-2.5 font-bold">
                   <GripVertical className="w-4 h-4 text-slate-500 cursor-grab" />
-                  <span className="w-5 h-5 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-[10px] font-bold">
+                  <span className="w-5 h-5 rounded-full bg-slate-900 text-yellow-400 border border-yellow-400/30 flex items-center justify-center text-[10px] font-black">
                     {index + 1}
                   </span>
                   <span>{getSectionLabel(secKey)}</span>
@@ -207,7 +205,7 @@ export default function FormSection({
                   <button
                     disabled={index === 0}
                     onClick={() => moveSection(index, 'up')}
-                    className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 cursor-pointer"
+                    className="p-1.5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-300 cursor-pointer"
                     title="Move Up"
                   >
                     <ArrowUp className="w-3.5 h-3.5" />
@@ -215,7 +213,7 @@ export default function FormSection({
                   <button
                     disabled={index === sectionOrder.length - 1}
                     onClick={() => moveSection(index, 'down')}
-                    className="p-1.5 rounded bg-slate-800 hover:bg-slate-700 disabled:opacity-30 text-slate-300 cursor-pointer"
+                    className="p-1.5 rounded bg-slate-900 hover:bg-slate-800 disabled:opacity-30 text-slate-300 cursor-pointer"
                     title="Move Down"
                   >
                     <ArrowDown className="w-3.5 h-3.5" />
@@ -227,7 +225,7 @@ export default function FormSection({
         </div>
       )}
 
-      {/* Form Tab Content Panel */}
+      {/* Form Content */}
       <div className="p-5 md:p-6">
         {activeTab === 'personal' && (
           <PersonalInfoForm
