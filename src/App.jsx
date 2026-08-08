@@ -8,6 +8,7 @@ import LoginPage from './components/LoginPage';
 import { sampleResume, emptyResume } from './data/sampleResume';
 import html2pdf from 'html2pdf.js';
 import { Info, Edit3, Eye } from 'lucide-react';
+import { fetchUserResumeFromSupabase, saveUserResumeToSupabase } from './lib/supabase';
 
 export default function App() {
   // User Authentication State
@@ -61,7 +62,7 @@ export default function App() {
     jobTitle: ''
   });
 
-  // 100% Silent Live Keystroke Auto-Save
+  // 100% Silent Live Keystroke Auto-Save (Local + Supabase Cloud Database)
   useEffect(() => {
     try {
       const email = currentUser?.email || 'guest';
@@ -70,23 +71,10 @@ export default function App() {
       console.error('LocalStorage write error:', e);
     }
 
-    // Debounced background MongoDB sync
+    // Debounced background Supabase Cloud Database sync
     const timer = setTimeout(async () => {
       if (currentUser?.email) {
-        try {
-          await fetch('/api/resumes/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              email: currentUser.email, 
-              resumeData: resume,
-              template: activeTemplate,
-              accentColor
-            })
-          });
-        } catch (err) {
-          // Silent catch
-        }
+        saveUserResumeToSupabase(currentUser.email, resume, activeTemplate, accentColor);
       }
     }, 1000);
 
@@ -135,17 +123,27 @@ export default function App() {
     localStorage.removeItem('resumeBuilderUser');
   };
 
-  // Switch the loaded resume draft when a new user logs in
+  // Switch the loaded resume draft when a new user logs in (Supabase Cloud + Local Storage fallback)
   useEffect(() => {
     if (currentUser?.email) {
       const email = currentUser.email;
-      const savedDraft = localStorage.getItem(`savedResumeDraft_${email}`);
-      if (savedDraft) {
-        setResume(JSON.parse(savedDraft));
-      } else {
-        const legacyDraft = localStorage.getItem('savedResumeDraft');
-        setResume(legacyDraft ? JSON.parse(legacyDraft) : sampleResume);
-      }
+
+      // 1. Try fetching from Supabase Cloud Database (Cross-device support)
+      fetchUserResumeFromSupabase(email).then((cloudResume) => {
+        if (cloudResume) {
+          setResume(cloudResume);
+          localStorage.setItem(`savedResumeDraft_${email}`, JSON.stringify(cloudResume));
+        } else {
+          // 2. Fallback to Local Storage draft if cloud copy doesn't exist yet
+          const savedDraft = localStorage.getItem(`savedResumeDraft_${email}`);
+          if (savedDraft) {
+            setResume(JSON.parse(savedDraft));
+          } else {
+            const legacyDraft = localStorage.getItem('savedResumeDraft');
+            setResume(legacyDraft ? JSON.parse(legacyDraft) : sampleResume);
+          }
+        }
+      });
     }
   }, [currentUser]);
 
