@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Sun, Moon, Laptop, Check, Pipette, FileSignature, User, LogOut } from 'lucide-react';
 import { exportAsDocx } from '../utils/exportHelpers';
 import ATSScoreMeter from './ATSScoreMeter';
-import CoverLetterModal from './CoverLetterModal';
 import ExecutiveLogo from './ExecutiveLogo';
 
 export default function Header({ 
@@ -22,12 +21,12 @@ export default function Header({
   themeMode,
   setThemeMode,
   currentUser,
-  onLogout
+  onLogout,
+  onOpenCoverLetter
 }) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showColorMenu, setShowColorMenu] = useState(false);
-  const [showCoverLetterModal, setShowCoverLetterModal] = useState(false);
 
   const menuRef = useRef(null);
   const themeMenuRef = useRef(null);
@@ -110,7 +109,7 @@ export default function Header({
 
           {/* Cover Letter Generator Toggle Button */}
           <button
-            onClick={() => setShowCoverLetterModal(true)}
+            onClick={onOpenCoverLetter}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0"
             title="Generate Matching Cover Letter"
           >
@@ -386,16 +385,6 @@ export default function Header({
           )}
         </div>
       </div>
-
-      {/* AI Cover Letter Generator Modal */}
-      <CoverLetterModal
-        isOpen={showCoverLetterModal}
-        onClose={() => setShowCoverLetterModal(false)}
-        resume={resume}
-        accentColor={accentColor}
-        fontFamily={activeFont}
-        template={activeTemplate}
-      />
     </header>
   );
 }

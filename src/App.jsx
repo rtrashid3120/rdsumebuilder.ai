@@ -3,6 +3,7 @@ import Header from './components/Header';
 import FormSection from './components/FormSection';
 import ResumePreview from './components/ResumePreview';
 import AISuggestionModal from './components/AISuggestionModal';
+import CoverLetterModal from './components/CoverLetterModal';
 import LoginPage from './components/LoginPage';
 import { sampleResume, emptyResume } from './data/sampleResume';
 import html2pdf from 'html2pdf.js';
@@ -30,6 +31,7 @@ export default function App() {
   const [activeFont, setActiveFont] = useState('sans');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
+  const [showCoverLetterModal, setShowCoverLetterModal] = useState(false);
   
   // Mobile View Tab Mode ('editor' | 'preview')
   const [mobileTab, setMobileTab] = useState('editor');
@@ -50,7 +52,7 @@ export default function App() {
     jobTitle: ''
   });
 
-  // 🔴 100% SILENT LIVE KEYSTROKE AUTO-SAVE TO LOCALSTORAGE & MONGODB CLOUD
+  // 100% Silent Live Keystroke Auto-Save
   useEffect(() => {
     try {
       localStorage.setItem('savedResumeDraft', JSON.stringify(resume));
@@ -238,7 +240,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--bg-app)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-red-600 selection:text-white transition-colors duration-300">
+    <div className="min-h-screen bg-[var(--bg-app)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-red-600 selection:text-white transition-colors duration-300 relative">
       
       {/* App Header Bar */}
       <Header
@@ -259,6 +261,7 @@ export default function App() {
         setThemeMode={setThemeMode}
         currentUser={currentUser}
         onLogout={handleLogout}
+        onOpenCoverLetter={() => setShowCoverLetterModal(true)}
       />
 
       {/* Main Workspace Container */}
@@ -379,6 +382,16 @@ export default function App() {
         originalText={aiModalState.originalText}
         jobTitle={aiModalState.jobTitle}
         onAccept={handleAcceptAISuggestion}
+      />
+
+      {/* 🔴 AI Cover Letter Generator Modal (ROOT-LEVEL Z-[9999] TOP-MOST OVERLAY) */}
+      <CoverLetterModal
+        isOpen={showCoverLetterModal}
+        onClose={() => setShowCoverLetterModal(false)}
+        resume={resume}
+        accentColor={accentColor}
+        fontFamily={activeFont}
+        template={activeTemplate}
       />
     </div>
   );
