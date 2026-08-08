@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Lock, Mail, User as UserIcon, CheckCircle2, AlertCircle, LogIn, UserPlus, Zap, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, Mail, User as UserIcon, CheckCircle2, AlertCircle, LogIn, UserPlus, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
 import ExecutiveLogo from './ExecutiveLogo';
 
 export default function LoginPage({ onLoginSuccess }) {
@@ -127,7 +127,7 @@ export default function LoginPage({ onLoginSuccess }) {
 
   const handleDemoLogin = () => {
     setIsLoading(true);
-    setSuccessMessage('⚡ Logging in with Demo Account...');
+    setSuccessMessage('Logging in with Demo Account...');
     setTimeout(() => {
       onLoginSuccess({ name: 'Mohamed Rashid', email: 'mohamed@resumebuilder.ai' });
     }, 600);
@@ -273,8 +273,8 @@ export default function LoginPage({ onLoginSuccess }) {
             onClick={handleDemoLogin}
             className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-bold text-yellow-400 border border-slate-800 transition-colors cursor-pointer"
           >
-            <Zap className="w-4 h-4 text-yellow-400 animate-bounce" />
-            <span>⚡ Demo Login (Instant Access)</span>
+            <Sparkles className="w-4 h-4 text-yellow-400" />
+            <span>Demo Login (Instant Access)</span>
           </button>
 
           <p className="text-[10px] text-slate-500 flex items-center justify-center gap-1 pt-1">
