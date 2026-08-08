@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Lock, Mail, User as UserIcon, CheckCircle2, AlertCircle, LogIn, UserPlus, Zap, ArrowRight } from 'lucide-react';
 import ExecutiveLogo from './ExecutiveLogo';
+import GoogleAccountPickerModal from './GoogleAccountPickerModal';
 
 export default function LoginPage({ onLoginSuccess }) {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -10,6 +11,7 @@ export default function LoginPage({ onLoginSuccess }) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showGooglePicker, setShowGooglePicker] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,15 +54,15 @@ export default function LoginPage({ onLoginSuccess }) {
     }
   };
 
-  // 1-Click Google / Gmail Single Click Login Handler
-  const handleGoogleSignIn = () => {
+  // Google Account Chooser Selection Handler
+  const handleSelectGoogleAccount = (account) => {
     setIsLoading(true);
-    setSuccessMessage('🌐 Connecting to Google Account...');
+    setSuccessMessage(`🌐 Connected with ${account.email}...`);
     setTimeout(() => {
       onLoginSuccess({ 
-        name: 'Mohamed Rashid', 
-        email: 'mohamed.rashid@gmail.com',
-        avatar: 'https://lh3.googleusercontent.com/a/default-user'
+        name: account.name, 
+        email: account.email,
+        avatar: account.avatar
       });
     }, 700);
   };
@@ -95,10 +97,10 @@ export default function LoginPage({ onLoginSuccess }) {
           </div>
         </div>
 
-        {/* 🔴 1-CLICK GOOGLE / GMAIL LOGIN BUTTON */}
+        {/* 🔴 1-CLICK GOOGLE / GMAIL ACCOUNT SELECTOR BUTTON */}
         <button
           type="button"
-          onClick={handleGoogleSignIn}
+          onClick={() => setShowGooglePicker(true)}
           className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-900 text-xs font-bold shadow-lg transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
         >
           {/* Official Google G Logo SVG */}
@@ -229,6 +231,13 @@ export default function LoginPage({ onLoginSuccess }) {
           </button>
         </div>
       </div>
+
+      {/* Google Account Picker Modal */}
+      <GoogleAccountPickerModal
+        isOpen={showGooglePicker}
+        onClose={() => setShowGooglePicker(false)}
+        onSelectAccount={handleSelectGoogleAccount}
+      />
     </div>
   );
 }
