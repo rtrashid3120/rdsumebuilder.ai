@@ -26,11 +26,10 @@ export default function ResumePreview({
   };
 
   // Section Renderers
-  // Fix #2: Heading is explicitly "Profile Summary"
   const renderSummarySection = () => {
     if (!personalInfo.summary) return null;
     return (
-      <div key="summary" className="space-y-1">
+      <div key="summary" className="space-y-1 py-1">
         <h2 
           className="text-xs font-extrabold uppercase tracking-widest pb-1 border-b"
           style={{ color: accentColor, borderColor: `${accentColor}33` }}
@@ -52,7 +51,7 @@ export default function ResumePreview({
   const renderEducationSection = () => {
     if (!education || education.length === 0) return null;
     return (
-      <div key="education" className="space-y-2">
+      <div key="education" className="space-y-2 py-1">
         <h2 
           className="text-xs font-extrabold uppercase tracking-widest pb-1 border-b"
           style={{ color: accentColor, borderColor: `${accentColor}33` }}
@@ -108,7 +107,7 @@ export default function ResumePreview({
   const renderExperienceSection = () => {
     if (!experience || experience.length === 0) return null;
     return (
-      <div key="experience" className="space-y-3">
+      <div key="experience" className="space-y-3 py-1">
         <h2 
           className="text-xs font-extrabold uppercase tracking-widest pb-1 border-b"
           style={{ color: accentColor, borderColor: `${accentColor}33` }}
@@ -119,7 +118,7 @@ export default function ResumePreview({
           {experience.map((exp, idx) => (
             <div key={exp.id || idx} className="space-y-1">
               <div className="flex flex-wrap items-baseline justify-between gap-1">
-                <h3 className="text-sm font-bold text-slate-900">
+                <h3 className="text-xs font-bold text-slate-900">
                   <span
                     contentEditable
                     suppressContentEditableWarning
@@ -165,7 +164,7 @@ export default function ResumePreview({
   const renderProjectsSection = () => {
     if (!projects || projects.length === 0) return null;
     return (
-      <div key="projects" className="space-y-2">
+      <div key="projects" className="space-y-2 py-1">
         <h2 
           className="text-xs font-extrabold uppercase tracking-widest pb-1 border-b"
           style={{ color: accentColor, borderColor: `${accentColor}33` }}
@@ -212,28 +211,32 @@ export default function ResumePreview({
     );
   };
 
+  // Robust HTML2Canvas-Safe Skills Section Renderer (Prevents Badge Overlap)
   const renderSkillsSection = () => {
     if (!skills || skills.length === 0) return null;
     return (
-      <div key="skills" className="space-y-2">
+      <div key="skills" className="space-y-2 py-1">
         <h2 
           className="text-xs font-extrabold uppercase tracking-widest pb-1 border-b"
           style={{ color: accentColor, borderColor: `${accentColor}33` }}
         >
           Skills & Expertise
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-xs">
           {skills.map((s, idx) => {
             const name = typeof s === 'string' ? s : s.name;
             const level = typeof s === 'object' ? s.level : '';
 
             return (
-              <div key={idx} className="flex items-center justify-between border-b border-slate-100 pb-1 min-w-0">
+              <div 
+                key={idx} 
+                className="flex items-center justify-between border-b border-slate-200 pb-1.5 min-w-0"
+              >
                 <span 
                   contentEditable
                   suppressContentEditableWarning
                   onBlur={(e) => handleBlur(`skills.${idx}.name`, e)}
-                  className="font-bold text-slate-800 truncate mr-2 focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
+                  className="font-bold text-slate-900 text-xs truncate mr-2 focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
                 >
                   {name}
                 </span>
@@ -242,7 +245,7 @@ export default function ResumePreview({
                     contentEditable
                     suppressContentEditableWarning
                     onBlur={(e) => handleBlur(`skills.${idx}.level`, e)}
-                    className="text-[9px] font-black px-2 py-0.5 rounded text-white uppercase tracking-wider whitespace-nowrap shrink-0"
+                    className="text-[9px] font-black px-2 py-0.5 rounded-full text-white uppercase tracking-wider whitespace-nowrap shrink-0 inline-block shadow-2xs"
                     style={{ backgroundColor: accentColor }}
                   >
                     {level}
@@ -261,7 +264,7 @@ export default function ResumePreview({
     if (!customSec || !customSec.items || customSec.items.length === 0) return null;
 
     return (
-      <div key={secId} className="space-y-2">
+      <div key={secId} className="space-y-2 py-1">
         <h2 
           className="text-xs font-extrabold uppercase tracking-widest pb-1 border-b"
           style={{ color: accentColor, borderColor: `${accentColor}33` }}
@@ -286,11 +289,11 @@ export default function ResumePreview({
         )}
 
         {customSec.type === 'badgeGrid' && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs">
             {customSec.items.map((item, idx) => (
-              <div key={item.id || idx} className="flex items-center justify-between border-b border-slate-100 pb-1">
-                <span className="font-semibold text-slate-800">{item.title}</span>
-                {item.subtitle && <span className="text-[10px] text-slate-500 font-medium">{item.subtitle}</span>}
+              <div key={item.id || idx} className="flex items-center justify-between border-b border-slate-200 pb-1.5">
+                <span className="font-bold text-slate-900">{item.title}</span>
+                {item.subtitle && <span className="text-[10px] text-slate-600 font-semibold">{item.subtitle}</span>}
               </div>
             ))}
           </div>
@@ -317,12 +320,7 @@ export default function ResumePreview({
     return null;
   };
 
-  // --------------------------------------------------------------------------
-  // TEMPLATE LAYOUT 1: CREATIVE SPLIT (Two-Tone Sidebar)
-  // Fix #1 & Fix #3:
-  // - Added LinkedIn & GitHub links to left sidebar.
-  // - Placed EDUCATION ABOVE SKILLS in the left sidebar as requested!
-  // --------------------------------------------------------------------------
+  // TEMPLATE LAYOUT 1: CREATIVE SPLIT
   if (template === 'creative') {
     return (
       <div 
@@ -330,12 +328,10 @@ export default function ResumePreview({
         className={`resume-preview-container page-a4 bg-white text-slate-900 shadow-2xl rounded-sm transition-all overflow-hidden ${fontClass}`}
       >
         <div className="grid grid-cols-12 min-h-full">
-          {/* Left Colored Sidebar */}
           <div 
             className="col-span-4 p-6 text-white space-y-5"
             style={{ backgroundColor: accentColor }}
           >
-            {/* Avatar & Title */}
             <div className="space-y-1">
               <h1 className="text-xl font-extrabold tracking-tight text-white leading-tight">
                 {personalInfo.fullName || 'Your Name'}
@@ -345,7 +341,6 @@ export default function ResumePreview({
               </p>
             </div>
 
-            {/* Fix #1: Complete Contact Details (Email, Phone, Location, Website, LinkedIn, GitHub) */}
             <div className="space-y-2 text-[11px] text-white/95 border-t border-white/20 pt-4">
               {personalInfo.email && <div className="break-all">✉️ {personalInfo.email}</div>}
               {personalInfo.phone && <div>📞 {personalInfo.phone}</div>}
@@ -355,7 +350,6 @@ export default function ResumePreview({
               {personalInfo.github && <div className="break-all flex items-center gap-1"><Code2 className="w-3 h-3 shrink-0" /> {personalInfo.github}</div>}
             </div>
 
-            {/* Fix #3: EDUCATION placed ABOVE SKILLS in left sidebar */}
             {education.length > 0 && (
               <div className="space-y-2 border-t border-white/20 pt-4">
                 <h3 className="text-xs font-black uppercase tracking-wider text-white">Education</h3>
@@ -370,7 +364,6 @@ export default function ResumePreview({
               </div>
             )}
 
-            {/* SKILLS placed below Education in left sidebar */}
             {skills.length > 0 && (
               <div className="space-y-2 border-t border-white/20 pt-4">
                 <h3 className="text-xs font-black uppercase tracking-wider text-white">Skills</h3>
@@ -386,10 +379,9 @@ export default function ResumePreview({
             )}
           </div>
 
-          {/* Main Content Right Column (Profile Summary, Experience, Projects) */}
-          <div className="col-span-8 p-8 space-y-6">
+          <div className="col-span-8 p-8 space-y-5">
             {sectionOrder
-              .filter(sec => sec !== 'skills' && sec !== 'education') // Education & Skills in left sidebar
+              .filter(sec => sec !== 'skills' && sec !== 'education')
               .map(sectionKey => renderSection(sectionKey))}
           </div>
         </div>
@@ -397,16 +389,14 @@ export default function ResumePreview({
     );
   }
 
-  // --------------------------------------------------------------------------
   // TEMPLATE LAYOUT 2: EXECUTIVE CLASSIC
-  // --------------------------------------------------------------------------
   if (template === 'executive') {
     return (
       <div 
         id="printable-resume" 
         className={`resume-preview-container page-a4 bg-white text-slate-900 shadow-2xl rounded-sm transition-all overflow-hidden ${fontClass}`}
       >
-        <div className="p-8 md:p-10 space-y-6">
+        <div className="p-8 md:p-10 space-y-5">
           <div className="text-center border-b-2 border-t-2 py-4 space-y-1" style={{ borderColor: accentColor }}>
             <h1 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-widest">
               {personalInfo.fullName || 'Your Full Name'}
@@ -424,7 +414,7 @@ export default function ResumePreview({
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-5">
             {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
           </div>
         </div>
@@ -432,84 +422,13 @@ export default function ResumePreview({
     );
   }
 
-  // --------------------------------------------------------------------------
-  // TEMPLATE LAYOUT 3: TECH MINIMALIST
-  // --------------------------------------------------------------------------
-  if (template === 'minimal') {
-    return (
-      <div 
-        id="printable-resume" 
-        className={`resume-preview-container page-a4 bg-white text-slate-900 shadow-2xl rounded-sm transition-all overflow-hidden ${fontClass}`}
-      >
-        <div className="p-8 md:p-10 space-y-6">
-          <div className="border-l-4 pl-4 space-y-1" style={{ borderColor: accentColor }}>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-              {personalInfo.fullName || 'Your Full Name'}
-            </h1>
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">
-              {personalInfo.jobTitle || 'Professional Job Title'}
-            </p>
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 pt-1">
-              {personalInfo.email && <span>{personalInfo.email}</span>}
-              {personalInfo.phone && <span>{personalInfo.phone}</span>}
-              {personalInfo.location && <span>{personalInfo.location}</span>}
-              {personalInfo.linkedin && <span>{personalInfo.linkedin}</span>}
-              {personalInfo.github && <span>{personalInfo.github}</span>}
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // --------------------------------------------------------------------------
-  // TEMPLATE LAYOUT 4: ELEGANT LUXE SERIF
-  // --------------------------------------------------------------------------
-  if (template === 'elegant') {
-    return (
-      <div 
-        id="printable-resume" 
-        className={`resume-preview-container page-a4 bg-white text-slate-900 shadow-2xl rounded-sm transition-all overflow-hidden font-serif`}
-      >
-        <div className="p-8 md:p-10 space-y-6">
-          <div className="text-center space-y-2 border-b pb-4" style={{ borderColor: `${accentColor}44` }}>
-            <h1 className="text-2xl font-bold tracking-wide text-slate-900">
-              {personalInfo.fullName || 'Your Full Name'}
-            </h1>
-            <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: accentColor }}>
-              {personalInfo.jobTitle || 'Professional Job Title'}
-            </p>
-            <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-slate-600">
-              {personalInfo.email && <span>{personalInfo.email}</span>}
-              {personalInfo.phone && <span>| {personalInfo.phone}</span>}
-              {personalInfo.location && <span>| {personalInfo.location}</span>}
-              {personalInfo.linkedin && <span>| {personalInfo.linkedin}</span>}
-              {personalInfo.github && <span>| {personalInfo.github}</span>}
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // --------------------------------------------------------------------------
   // DEFAULT / MODERN SLATE TEMPLATE
-  // --------------------------------------------------------------------------
   return (
     <div 
       id="printable-resume" 
       className={`resume-preview-container page-a4 bg-white text-slate-900 shadow-2xl rounded-sm transition-all overflow-hidden ${fontClass}`}
     >
-      <div className="p-8 md:p-10 space-y-6 text-slate-800 leading-relaxed">
-        {/* Fix #1: Header with LinkedIn & GitHub Links */}
+      <div className="p-8 md:p-10 space-y-5 text-slate-800 leading-relaxed">
         <div className="border-b-2 pb-4" style={{ borderColor: accentColor }}>
           <h1 
             contentEditable
@@ -569,8 +488,7 @@ export default function ResumePreview({
           </div>
         </div>
 
-        {/* Dynamic Reorderable Sections */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
         </div>
       </div>
