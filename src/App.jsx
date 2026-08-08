@@ -209,7 +209,7 @@ export default function App() {
               </button>
             </div>
 
-            <div className="w-full flex justify-center py-6">
+            <div className="w-full flex justify-center py-6 overflow-x-auto">
               <ResumePreview
                 resume={resume}
                 template={activeTemplate}
@@ -221,11 +221,11 @@ export default function App() {
             </div>
           </div>
         ) : (
-          /* Dual-Pane Split Layout */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          /* Dual-Pane Split Layout - Fix 2: Responsive col-span-5 / col-span-7 with zero overlapping */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
             {/* Left Column: Interactive Forms */}
-            <div className="lg:col-span-6 xl:col-span-5 space-y-4 no-print">
+            <div className="lg:col-span-5 space-y-4 no-print z-10">
               <div className="flex items-center justify-between">
                 <h2 className="text-xs font-extrabold uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-2">
                   Resume Form Editor
@@ -242,15 +242,15 @@ export default function App() {
               />
             </div>
 
-            {/* Right Column: Live A4 Canvas Preview */}
-            <div className="lg:col-span-6 xl:col-span-7 sticky top-24 space-y-4">
+            {/* Right Column: Live A4 Canvas Preview (Non-overlapping & Scrollable) */}
+            <div className="lg:col-span-7 sticky top-20 space-y-4 z-0 min-w-0">
               <div className="no-print flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-xl border border-[var(--border-color)] text-xs text-[var(--text-primary)] font-semibold shadow-md">
                 <span>✨ <strong>Direct Edit Mode</strong>: Click any text on the A4 resume to edit live</span>
                 <span className="capitalize text-yellow-400 font-bold">{activeTemplate}</span>
               </div>
 
-              {/* A4 Canvas Container */}
-              <div className="w-full overflow-x-auto p-4 md:p-6 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl flex justify-center backdrop-blur-sm min-h-[700px]">
+              {/* A4 Canvas Scroll Container */}
+              <div className="w-full overflow-x-auto p-3 sm:p-5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl shadow-2xl flex justify-center backdrop-blur-sm min-h-[700px]">
                 <ResumePreview
                   resume={resume}
                   template={activeTemplate}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Mail, Phone, MapPin, Globe, Code2, Link as LinkIcon, AlertTriangle, Sparkles } from 'lucide-react';
+import { Mail, Phone, MapPin, Globe, Code2, Link as LinkIcon, AlertTriangle } from 'lucide-react';
 
 export default function ResumePreview({ 
   resume, 
@@ -28,7 +28,7 @@ export default function ResumePreview({
     const checkOverflow = () => {
       if (containerRef.current) {
         const height = containerRef.current.scrollHeight;
-        const targetA4Height = 1123; // Standard A4 height in pixels
+        const targetA4Height = 1123;
         if (height > targetA4Height + 10) {
           setIsOverflowing(true);
           setOverflowPercentage(Math.round((height / targetA4Height) * 100));
@@ -236,11 +236,10 @@ export default function ResumePreview({
     );
   };
 
-  // HTML2Canvas Table Renderer for Skills - Eliminates Text Overlap Completely!
+  // Fix 1: Outline Badge Table Renderer for Skills - Eliminates html2canvas Overlap 100%!
   const renderSkillsSection = () => {
     if (!skills || skills.length === 0) return null;
     
-    // Divide skills into 2 equal columns for table layout
     const half = Math.ceil(skills.length / 2);
     const col1 = skills.slice(0, half);
     const col2 = skills.slice(half);
@@ -279,8 +278,12 @@ export default function ResumePreview({
                           contentEditable
                           suppressContentEditableWarning
                           onBlur={(e) => handleBlur(`skills.${idx}.level`, e)}
-                          className="text-[9px] font-black px-2 py-0.5 rounded text-white uppercase tracking-wider inline-block"
-                          style={{ backgroundColor: accentColor }}
+                          className="text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider inline-block font-sans shadow-2xs"
+                          style={{ 
+                            color: accentColor,
+                            border: `1.5px solid ${accentColor}`,
+                            backgroundColor: '#ffffff'
+                          }}
                         >
                           {level}
                         </span>
@@ -317,8 +320,12 @@ export default function ResumePreview({
                           contentEditable
                           suppressContentEditableWarning
                           onBlur={(e) => handleBlur(`skills.${actualIdx}.level`, e)}
-                          className="text-[9px] font-black px-2 py-0.5 rounded text-white uppercase tracking-wider inline-block"
-                          style={{ backgroundColor: accentColor }}
+                          className="text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider inline-block font-sans shadow-2xs"
+                          style={{ 
+                            color: accentColor,
+                            border: `1.5px solid ${accentColor}`,
+                            backgroundColor: '#ffffff'
+                          }}
                         >
                           {level}
                         </span>
@@ -398,7 +405,7 @@ export default function ResumePreview({
   };
 
   return (
-    <div className="relative flex flex-col items-center">
+    <div className="relative flex flex-col items-center w-full">
       
       {/* Real-Time A4 Overflow Warning Indicator */}
       {isOverflowing && (
@@ -407,7 +414,7 @@ export default function ResumePreview({
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 animate-bounce" />
             <div>
               <span className="font-extrabold text-amber-300">⚠️ A4 Page Height Exceeded ({overflowPercentage}% of 1 Page)</span>
-              <p className="text-[11px] text-slate-300">Content spills onto page 2. Trim 1-2 bullet points or remove an extra section for a 1-page ATS layout.</p>
+              <p className="text-[11px] text-slate-300">Content spills onto page 2. Trim 1-2 bullet points for a 1-page ATS layout.</p>
             </div>
           </div>
         </div>
