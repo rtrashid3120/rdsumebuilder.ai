@@ -64,25 +64,30 @@ export default function App() {
     return () => mediaQuery.removeEventListener('change', handleSystemChange);
   }, [themeMode]);
 
+  // Robust Field Path Updater for Deep Object & Array Paths (Fixes Custom Section Edit Blank Page Crash)
   const handleUpdateText = (fieldPath, newValue) => {
-    const parts = fieldPath.split('.');
-    const updated = JSON.parse(JSON.stringify(resume));
+    if (!fieldPath) return;
 
-    if (parts.length === 2) {
-      updated[parts[0]][parts[1]] = newValue;
-    } else if (parts.length === 3) {
-      const [arrName, idxStr, subProp] = parts;
-      const index = parseInt(idxStr, 10);
-      if (updated[arrName] && updated[arrName][index]) {
-        if (arrName === 'skills' && typeof updated[arrName][index] === 'string') {
-          updated[arrName][index] = { name: newValue, level: '' };
-        } else {
-          updated[arrName][index][subProp] = newValue;
+    try {
+      const parts = fieldPath.split('.');
+      const updated = JSON.parse(JSON.stringify(resume));
+
+      let current = updated;
+      for (let i = 0; i < parts.length - 1; i++) {
+        const key = parts[i];
+        if (current[key] === undefined || current[key] === null) {
+          return; // Guard against undefined path
         }
+        current = current[key];
       }
-    }
 
-    setResume(updated);
+      const lastKey = parts[parts.length - 1];
+      current[lastKey] = newValue;
+
+      setResume(updated);
+    } catch (err) {
+      console.error('Error updating text field path:', fieldPath, err);
+    }
   };
 
   const handleOpenAIModal = (index, originalText, jobTitle) => {
@@ -221,7 +226,7 @@ export default function App() {
             </div>
           </div>
         ) : (
-          /* Dual-Pane Split Layout - Fix 2: Responsive col-span-5 / col-span-7 with zero overlapping */
+          /* Dual-Pane Split Layout */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
             
             {/* Left Column: Interactive Forms */}
@@ -242,7 +247,7 @@ export default function App() {
               />
             </div>
 
-            {/* Right Column: Live A4 Canvas Preview (Non-overlapping & Scrollable) */}
+            {/* Right Column: Live A4 Canvas Preview */}
             <div className="lg:col-span-7 sticky top-20 space-y-4 z-0 min-w-0">
               <div className="no-print flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-xl border border-[var(--border-color)] text-xs text-[var(--text-primary)] font-semibold shadow-md">
                 <span>✨ <strong>Direct Edit Mode</strong>: Click any text on the A4 resume to edit live</span>
