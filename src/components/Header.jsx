@@ -77,7 +77,7 @@ export default function Header({
     <header className="no-print sticky top-0 z-40 bg-slate-950/95 dark:bg-black/95 backdrop-blur-md border-b border-slate-800 text-white px-4 lg:px-8 py-2.5 shadow-2xl transition-all">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         
-        {/* Brand Logo & Title */}
+        {/* Brand Logo & Title - ResumeBuilder.ai */}
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 via-amber-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-red-600/30 border border-yellow-400/40 shrink-0">
             <Zap className="w-4 h-4 text-black fill-black animate-pulse" />
@@ -85,7 +85,7 @@ export default function Header({
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-black tracking-tight text-white leading-none">
-                ResuCraft<span className="text-red-500">.ai</span>
+                ResumeBuilder<span className="text-red-500">.ai</span>
               </h1>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-yellow-400/10 text-yellow-400 border border-yellow-400/30">
                 <Sparkles className="w-2.5 h-2.5 text-yellow-400 animate-spin-slow" />
@@ -134,7 +134,7 @@ export default function Header({
 
           <div className="h-4 w-px bg-slate-800 hidden sm:block" />
 
-          {/* NEW: Compact Accent Color Dropdown Menu */}
+          {/* Compact Accent Color Dropdown Menu */}
           <div className="relative" ref={colorMenuRef}>
             <button
               onClick={() => setShowColorMenu(!showColorMenu)}

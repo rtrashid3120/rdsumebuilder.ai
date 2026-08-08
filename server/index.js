@@ -17,7 +17,7 @@ app.use(express.json({ limit: '10mb' }));
 
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', service: 'ResuCraft.ai Backend API', timestamp: new Date() });
+  res.json({ status: 'ok', service: 'ResumeBuilder.ai Backend API', timestamp: new Date() });
 });
 
 // API Routes
@@ -30,5 +30,5 @@ mongoose.connect(MONGO_URI)
   .catch((err) => console.log(` MongoDB Connection Warning: ${err.message}. Server running with local memory storage.`));
 
 app.listen(PORT, () => {
-  console.log(` ResuCraft.ai Express server listening on http://localhost:${PORT}`);
+  console.log(` ResumeBuilder.ai Express server listening on http://localhost:${PORT}`);
 });
