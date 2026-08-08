@@ -19,7 +19,16 @@ export default function App() {
   // Persistent Draft State Initializer
   const [resume, setResume] = useState(() => {
     try {
-      const savedDraft = localStorage.getItem('savedResumeDraft');
+      const savedUser = localStorage.getItem('resumeBuilderUser');
+      const email = savedUser ? JSON.parse(savedUser).email : 'guest';
+      const savedDraft = localStorage.getItem(`savedResumeDraft_${email}`);
+      
+      // Also check the old generic key if no user-specific draft exists yet
+      if (!savedDraft) {
+        const legacyDraft = localStorage.getItem('savedResumeDraft');
+        if (legacyDraft) return JSON.parse(legacyDraft);
+      }
+      
       return savedDraft ? JSON.parse(savedDraft) : sampleResume;
     } catch (e) {
       return sampleResume;
@@ -55,7 +64,8 @@ export default function App() {
   // 100% Silent Live Keystroke Auto-Save
   useEffect(() => {
     try {
-      localStorage.setItem('savedResumeDraft', JSON.stringify(resume));
+      const email = currentUser?.email || 'guest';
+      localStorage.setItem(`savedResumeDraft_${email}`, JSON.stringify(resume));
     } catch (e) {
       console.error('LocalStorage write error:', e);
     }
@@ -124,6 +134,20 @@ export default function App() {
     setCurrentUser(null);
     localStorage.removeItem('resumeBuilderUser');
   };
+
+  // Switch the loaded resume draft when a new user logs in
+  useEffect(() => {
+    if (currentUser?.email) {
+      const email = currentUser.email;
+      const savedDraft = localStorage.getItem(`savedResumeDraft_${email}`);
+      if (savedDraft) {
+        setResume(JSON.parse(savedDraft));
+      } else {
+        const legacyDraft = localStorage.getItem('savedResumeDraft');
+        setResume(legacyDraft ? JSON.parse(legacyDraft) : sampleResume);
+      }
+    }
+  }, [currentUser]);
 
   // Safe Deep Field Path Updater
   const handleUpdateText = (fieldPath, newValue) => {

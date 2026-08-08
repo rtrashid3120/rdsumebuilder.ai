@@ -127,23 +127,15 @@ export default function LoginPage({ onLoginSuccess }) {
 
   const handleDirectGmailLogin = () => {
     setIsLoading(true);
-    setSuccessMessage('Connecting with Google / Gmail ID (rtrashid3120@gmail.com)...');
+    setSuccessMessage('Connecting to Google OAuth via Supabase...');
     
-    if (window.google) {
-      try {
-        window.google.accounts.id.prompt();
-      } catch (e) {
-        // Fallback
-      }
-    }
-
-    setTimeout(() => {
-      onLoginSuccess({ 
-        name: 'Mohamed Rashid', 
-        email: 'rtrashid3120@gmail.com',
-        avatar: 'https://lh3.googleusercontent.com/a/default-user'
+    try {
+      import('../lib/supabase').then(module => {
+        module.signInWithGoogleSupabase();
       });
-    }, 700);
+    } catch (e) {
+      console.error('Supabase redirect error:', e);
+    }
   };
 
   const handleDemoLogin = () => {
