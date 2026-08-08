@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Zap, Sun, Moon, Laptop, Check, Pipette, FileSignature } from 'lucide-react';
+import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Sun, Moon, Laptop, Check, Pipette, FileSignature } from 'lucide-react';
 import { exportAsDocx } from '../utils/exportHelpers';
 import ATSScoreMeter from './ATSScoreMeter';
 import CoverLetterModal from './CoverLetterModal';
+import ExecutiveLogo from './ExecutiveLogo';
 
 export default function Header({ 
   onLoadSample, 
@@ -80,11 +81,9 @@ export default function Header({
     <header className="no-print sticky top-0 z-40 bg-slate-950/95 dark:bg-black/95 backdrop-blur-md border-b border-slate-800 text-white px-4 lg:px-8 py-2.5 shadow-2xl transition-all">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         
-        {/* Brand Logo & Title */}
+        {/* Brand Executive Logo & Title */}
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 via-amber-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-red-600/30 border border-yellow-400/40 shrink-0">
-            <Zap className="w-4 h-4 text-black fill-black animate-pulse" />
-          </div>
+          <ExecutiveLogo className="w-10 h-10" />
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-black tracking-tight text-white leading-none">
@@ -316,7 +315,7 @@ export default function Header({
             <span>{isPreviewMode ? 'Edit Mode' : 'Full Preview'}</span>
           </button>
 
-          {/* Request 2 Fix: Streamlined 2-Option Download Button (PDF & Word) */}
+          {/* Streamlined 2-Option Download Button */}
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setShowExportMenu(!showExportMenu)}
@@ -328,14 +327,12 @@ export default function Header({
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showExportMenu ? 'rotate-180' : ''}`} />
             </button>
 
-            {/* Clean, Simple 2-Option Dropdown */}
             {showExportMenu && (
               <div className="absolute right-0 mt-2 w-52 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1.5 z-50 animate-fade-in space-y-1 text-white">
                 <div className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-400 border-b border-slate-800 mb-1">
                   Download Format:
                 </div>
 
-                {/* 1-Click PDF */}
                 <button
                   onClick={() => {
                     setShowExportMenu(false);
@@ -350,7 +347,6 @@ export default function Header({
                   </div>
                 </button>
 
-                {/* 1-Click Word (.docx) */}
                 <button
                   onClick={() => {
                     setShowExportMenu(false);
