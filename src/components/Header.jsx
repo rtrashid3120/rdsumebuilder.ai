@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Sun, Moon, Laptop, Check, Pipette, FileSignature } from 'lucide-react';
+import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Sun, Moon, Laptop, Check, Pipette, FileSignature, User, LogOut, Lock } from 'lucide-react';
 import { exportAsDocx } from '../utils/exportHelpers';
 import ATSScoreMeter from './ATSScoreMeter';
 import CoverLetterModal from './CoverLetterModal';
 import ExecutiveLogo from './ExecutiveLogo';
+import AuthModal from './AuthModal';
 
 export default function Header({ 
   onLoadSample, 
@@ -26,6 +27,13 @@ export default function Header({
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showColorMenu, setShowColorMenu] = useState(false);
   const [showCoverLetterModal, setShowCoverLetterModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  
+  // User Authentication State
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('resumeBuilderUser');
+    return saved ? JSON.parse(saved) : null;
+  });
 
   const menuRef = useRef(null);
   const themeMenuRef = useRef(null);
@@ -46,6 +54,16 @@ export default function Header({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem('resumeBuilderUser', JSON.stringify(user));
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('resumeBuilderUser');
+  };
 
   const colors = [
     { name: 'Crimson Red', value: '#dc2626' },
@@ -153,7 +171,7 @@ export default function Header({
 
           <div className="h-4 w-px bg-slate-800 hidden md:block" />
 
-          {/* Compact Accent Color Dropdown */}
+          {/* Accent Color Dropdown */}
           <div className="relative" ref={colorMenuRef}>
             <button
               onClick={() => setShowColorMenu(!showColorMenu)}
@@ -227,9 +245,32 @@ export default function Header({
           </div>
         </div>
 
-        {/* Action Buttons & Streamlined 2-Option Download Button */}
+        {/* User Auth Profile Badge & Action Buttons */}
         <div className="flex items-center gap-2 relative">
           
+          {/* User Auth Profile Badge */}
+          {currentUser ? (
+            <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-xl text-xs font-bold">
+              <User className="w-3.5 h-3.5 text-yellow-400" />
+              <span className="hidden sm:inline text-white truncate max-w-[110px]">{currentUser.name}</span>
+              <button
+                onClick={handleLogout}
+                className="p-1 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded transition-colors cursor-pointer ml-0.5"
+                title="Sign Out"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowAuthModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-yellow-400 border border-slate-800 text-xs font-bold transition-all cursor-pointer"
+            >
+              <Lock className="w-3.5 h-3.5 text-yellow-400" />
+              <span>Login</span>
+            </button>
+          )}
+
           {/* Dynamic Theme Switcher */}
           <div className="relative" ref={themeMenuRef}>
             <button
@@ -374,6 +415,13 @@ export default function Header({
         accentColor={accentColor}
         fontFamily={activeFont}
         template={activeTemplate}
+      />
+
+      {/* User Login & Register Modal */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onLoginSuccess={handleLoginSuccess}
       />
     </header>
   );

@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import resumeRoutes from './routes/resumeRoutes.js';
 import suggestRoutes from './routes/suggestRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
 
@@ -17,12 +18,18 @@ app.use(express.json({ limit: '10mb' }));
 
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', service: 'ResumeBuilder.ai Backend API', timestamp: new Date() });
+  res.json({ 
+    status: 'ok', 
+    service: 'ResumeBuilder.ai Backend API', 
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    timestamp: new Date() 
+  });
 });
 
 // API Routes
 app.use('/api/resumes', resumeRoutes);
 app.use('/api/suggest', suggestRoutes);
+app.use('/api/auth', authRoutes);
 
 // Connect to MongoDB
 mongoose.connect(MONGO_URI)
@@ -32,3 +39,5 @@ mongoose.connect(MONGO_URI)
 app.listen(PORT, '0.0.0.0', () => {
   console.log(` ResumeBuilder.ai Express server listening on http://0.0.0.0:${PORT}`);
 });
+
+export default app;
