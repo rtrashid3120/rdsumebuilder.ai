@@ -15,7 +15,6 @@ export default function App() {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   
-  // Dynamic Adaptive Theme Mode ('system' | 'dark' | 'light')
   const [themeMode, setThemeMode] = useState('system');
 
   const [sectionOrder, setSectionOrder] = useState([
@@ -33,7 +32,6 @@ export default function App() {
     jobTitle: ''
   });
 
-  // Dynamic Theme Effect - Listens to OS preference & user toggle
   useEffect(() => {
     const root = document.documentElement;
 
@@ -57,7 +55,6 @@ export default function App() {
 
     applyTheme();
 
-    // Listen for OS system theme changes live
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleSystemChange = () => {
       if (themeMode === 'system') applyTheme();
@@ -113,6 +110,7 @@ export default function App() {
     }
   };
 
+  // Direct Vector PDF Export Handler
   const handleDownloadPDF = () => {
     setIsExporting(true);
     const element = document.getElementById('printable-resume');
@@ -124,10 +122,10 @@ export default function App() {
 
     const nameSlug = (resume.personalInfo.fullName || 'Resume').replace(/\s+/g, '_');
     const opt = {
-      margin: 0,
+      margin: [0, 0, 0, 0],
       filename: `${nameSlug}_Resume.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false },
+      html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
@@ -200,7 +198,7 @@ export default function App() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             
             {/* Left Column: Interactive Forms */}
-            <div className="lg:col-span-6 xl:col-span-5 space-y-4">
+            <div className="lg:col-span-6 xl:col-span-5 space-y-4 no-print">
               <div className="flex items-center justify-between">
                 <h2 className="text-xs font-extrabold uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-2">
                   Resume Form Editor
@@ -219,7 +217,7 @@ export default function App() {
 
             {/* Right Column: Live A4 Canvas Preview */}
             <div className="lg:col-span-6 xl:col-span-7 sticky top-24 space-y-4">
-              <div className="flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-xl border border-[var(--border-color)] text-xs text-[var(--text-primary)] font-semibold shadow-md">
+              <div className="no-print flex items-center justify-between bg-[var(--bg-card)] p-3 rounded-xl border border-[var(--border-color)] text-xs text-[var(--text-primary)] font-semibold shadow-md">
                 <span>✨ <strong>Direct Edit Mode</strong>: Click any text on the A4 resume to edit live</span>
                 <span className="capitalize text-yellow-400 font-bold">{activeTemplate}</span>
               </div>
