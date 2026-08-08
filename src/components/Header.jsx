@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Sun, Moon, Laptop, Check, Pipette, FileSignature, User, LogOut, Lock } from 'lucide-react';
+import { Sparkles, Download, Eye, RotateCcw, FileCheck, LayoutTemplate, Palette, Type, ChevronDown, FileText, Sun, Moon, Laptop, Check, Pipette, FileSignature, User, LogOut } from 'lucide-react';
 import { exportAsDocx } from '../utils/exportHelpers';
 import ATSScoreMeter from './ATSScoreMeter';
 import CoverLetterModal from './CoverLetterModal';
 import ExecutiveLogo from './ExecutiveLogo';
-import AuthModal from './AuthModal';
 
 export default function Header({ 
   onLoadSample, 
@@ -21,19 +20,14 @@ export default function Header({
   isExporting,
   resume,
   themeMode,
-  setThemeMode
+  setThemeMode,
+  currentUser,
+  onLogout
 }) {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [showColorMenu, setShowColorMenu] = useState(false);
   const [showCoverLetterModal, setShowCoverLetterModal] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  
-  // User Authentication State
-  const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('resumeBuilderUser');
-    return saved ? JSON.parse(saved) : null;
-  });
 
   const menuRef = useRef(null);
   const themeMenuRef = useRef(null);
@@ -54,16 +48,6 @@ export default function Header({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const handleLoginSuccess = (user) => {
-    setCurrentUser(user);
-    localStorage.setItem('resumeBuilderUser', JSON.stringify(user));
-  };
-
-  const handleLogout = () => {
-    setCurrentUser(null);
-    localStorage.removeItem('resumeBuilderUser');
-  };
 
   const colors = [
     { name: 'Crimson Red', value: '#dc2626' },
@@ -245,32 +229,9 @@ export default function Header({
           </div>
         </div>
 
-        {/* User Auth Profile Badge & Action Buttons */}
+        {/* Action Buttons & Top-Right Log Out Button */}
         <div className="flex items-center gap-2 relative">
           
-          {/* User Auth Profile Badge */}
-          {currentUser ? (
-            <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 px-2.5 py-1 rounded-xl text-xs font-bold">
-              <User className="w-3.5 h-3.5 text-yellow-400" />
-              <span className="hidden sm:inline text-white truncate max-w-[110px]">{currentUser.name}</span>
-              <button
-                onClick={handleLogout}
-                className="p-1 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded transition-colors cursor-pointer ml-0.5"
-                title="Sign Out"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 text-yellow-400 border border-slate-800 text-xs font-bold transition-all cursor-pointer"
-            >
-              <Lock className="w-3.5 h-3.5 text-yellow-400" />
-              <span>Login</span>
-            </button>
-          )}
-
           {/* Dynamic Theme Switcher */}
           <div className="relative" ref={themeMenuRef}>
             <button
@@ -404,6 +365,19 @@ export default function Header({
               </div>
             )}
           </div>
+
+          {/* Top-Right Corner Log Out Button */}
+          {currentUser && (
+            <button
+              onClick={onLogout}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-950/80 hover:bg-red-600 text-white border border-red-500/50 text-xs font-extrabold transition-all cursor-pointer shadow-md ml-1"
+              title="Log out and return to Login Screen"
+            >
+              <User className="w-3.5 h-3.5 text-yellow-400" />
+              <span className="hidden sm:inline truncate max-w-[90px]">{currentUser.name}</span>
+              <LogOut className="w-3.5 h-3.5 text-white" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -415,13 +389,6 @@ export default function Header({
         accentColor={accentColor}
         fontFamily={activeFont}
         template={activeTemplate}
-      />
-
-      {/* User Login & Register Modal */}
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        onLoginSuccess={handleLoginSuccess}
       />
     </header>
   );

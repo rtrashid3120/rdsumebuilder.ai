@@ -3,11 +3,18 @@ import Header from './components/Header';
 import FormSection from './components/FormSection';
 import ResumePreview from './components/ResumePreview';
 import AISuggestionModal from './components/AISuggestionModal';
+import LoginPage from './components/LoginPage';
 import { sampleResume, emptyResume } from './data/sampleResume';
 import html2pdf from 'html2pdf.js';
-import { Eye, Info } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 export default function App() {
+  // User Authentication State
+  const [currentUser, setCurrentUser] = useState(() => {
+    const saved = localStorage.getItem('resumeBuilderUser');
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [resume, setResume] = useState(sampleResume);
   const [activeTemplate, setActiveTemplate] = useState('modern');
   const [accentColor, setAccentColor] = useState('#dc2626');
@@ -64,7 +71,17 @@ export default function App() {
     return () => mediaQuery.removeEventListener('change', handleSystemChange);
   }, [themeMode]);
 
-  // Robust Field Path Updater for Deep Object & Array Paths (Fixes Custom Section Edit Blank Page Crash)
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    localStorage.setItem('resumeBuilderUser', JSON.stringify(user));
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    localStorage.removeItem('resumeBuilderUser');
+  };
+
+  // Safe Deep Field Path Updater
   const handleUpdateText = (fieldPath, newValue) => {
     if (!fieldPath) return;
 
@@ -76,7 +93,7 @@ export default function App() {
       for (let i = 0; i < parts.length - 1; i++) {
         const key = parts[i];
         if (current[key] === undefined || current[key] === null) {
-          return; // Guard against undefined path
+          return;
         }
         current = current[key];
       }
@@ -115,7 +132,7 @@ export default function App() {
     }
   };
 
-  // Direct Vector PDF Export Handler with OKLAB/OKLCH Sanitization
+  // Direct Vector PDF Export Handler
   const handleDownloadPDF = () => {
     setIsExporting(true);
     const element = document.getElementById('printable-resume');
@@ -173,10 +190,15 @@ export default function App() {
       });
   };
 
+  // IF USER IS NOT LOGGED IN, RENDER DEDICATED LOGIN PAGE GATE FIRST
+  if (!currentUser) {
+    return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <div className="min-h-screen bg-[var(--bg-app)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-red-600 selection:text-white transition-colors duration-300">
       
-      {/* App Header Bar */}
+      {/* App Header Bar with Top-Right Log Out Button */}
       <Header
         onLoadSample={() => setResume(sampleResume)}
         onClear={() => setResume(emptyResume)}
@@ -193,6 +215,8 @@ export default function App() {
         resume={resume}
         themeMode={themeMode}
         setThemeMode={setThemeMode}
+        currentUser={currentUser}
+        onLogout={handleLogout}
       />
 
       {/* Main Workspace Container */}
