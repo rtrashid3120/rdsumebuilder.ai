@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, Briefcase, GraduationCap, Wrench, FolderGit2, ArrowUp, ArrowDown, Sparkles, SlidersHorizontal, GripVertical, Layers } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Briefcase, GraduationCap, Wrench, FolderGit2, ArrowUp, ArrowDown, Sparkles, SlidersHorizontal, GripVertical, Layers, X } from 'lucide-react';
 import PersonalInfoForm from './PersonalInfoForm';
 import ExperienceForm from './ExperienceForm';
 import EducationForm from './EducationForm';
@@ -17,6 +17,23 @@ export default function FormSection({
   const [activeTab, setActiveTab] = useState('personal');
   const [showOrderManager, setShowOrderManager] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState(null);
+  const orderManagerRef = useRef(null);
+
+  // Fix Item 2: Click-outside listener so clicking anywhere outside auto-closes the Reorder panel!
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (orderManagerRef.current && !orderManagerRef.current.contains(event.target)) {
+        setShowOrderManager(false);
+      }
+    };
+
+    if (showOrderManager) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showOrderManager]);
 
   const tabs = [
     { id: 'personal', label: 'Personal Info', icon: User, count: null },
@@ -27,7 +44,6 @@ export default function FormSection({
     { id: 'custom', label: 'Custom Sections', icon: Layers, count: resume.customSections?.length || 0 },
   ];
 
-  // Dynamic section labels map including custom sections
   const getSectionLabel = (secKey) => {
     const builtInLabels = {
       summary: 'Professional Profile Summary',
@@ -39,7 +55,6 @@ export default function FormSection({
 
     if (builtInLabels[secKey]) return builtInLabels[secKey];
     
-    // Lookup in custom sections
     const foundCustom = resume.customSections?.find(c => c.id === secKey);
     if (foundCustom) return `➕ ${foundCustom.title}`;
     
@@ -86,8 +101,14 @@ export default function FormSection({
     }
   };
 
+  // Switch tab and auto-close order manager
+  const handleTabClick = (tabId) => {
+    setActiveTab(tabId);
+    setShowOrderManager(false);
+  };
+
   return (
-    <div className="bg-slate-900/80 border border-slate-800 rounded-2xl shadow-xl overflow-hidden backdrop-blur-md space-y-0">
+    <div className="bg-slate-900/80 border border-slate-800 rounded-2xl shadow-xl overflow-hidden backdrop-blur-md space-y-0 relative">
       
       {/* Navigation Tabs */}
       <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950/60 overflow-x-auto no-scrollbar">
@@ -98,7 +119,7 @@ export default function FormSection({
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabClick(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3.5 text-xs font-semibold whitespace-nowrap border-b-2 transition-all cursor-pointer ${
                   isActive
                     ? 'border-indigo-500 text-indigo-400 bg-indigo-500/10'
@@ -130,7 +151,11 @@ export default function FormSection({
         {/* Section Reorder Toggle Button */}
         <button
           onClick={() => setShowOrderManager(!showOrderManager)}
-          className="px-3 py-2 mr-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs font-semibold border border-indigo-500/30 flex items-center gap-1.5 whitespace-nowrap transition-colors cursor-pointer"
+          className={`px-3 py-2 mr-2 rounded-lg text-xs font-semibold border flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer ${
+            showOrderManager 
+              ? 'bg-indigo-600 text-white border-indigo-500 shadow-md shadow-indigo-500/20' 
+              : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+          }`}
           title="Reorder Resume Sections"
         >
           <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -138,12 +163,22 @@ export default function FormSection({
         </button>
       </div>
 
-      {/* Expandable Section Order Manager with Drag & Drop */}
+      {/* Item 2 Fix: Auto-Dismissing Section Order Manager Popup */}
       {showOrderManager && (
-        <div className="bg-slate-950 border-b border-slate-800 p-4 space-y-2 animate-fade-in">
+        <div 
+          ref={orderManagerRef}
+          className="bg-slate-950 border-b border-slate-800 p-4 space-y-2 animate-fade-in shadow-2xl z-30"
+        >
           <div className="flex items-center justify-between text-xs font-bold text-slate-300 mb-2">
-            <span>📋 Drag & Drop or use arrows to rearrange sections on preview:</span>
-            <span className="text-[11px] text-indigo-400 font-normal">Includes custom sections</span>
+            <span className="flex items-center gap-1.5 text-indigo-300">
+              📋 Drag & Drop or use arrows to rearrange sections on preview:
+            </span>
+            <button 
+              onClick={() => setShowOrderManager(false)}
+              className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
           <div className="space-y-2">
@@ -234,7 +269,6 @@ export default function FormSection({
           <CustomSectionsForm
             customSections={resume.customSections || []}
             onChange={(customSections) => {
-              // Ensure newly added custom section IDs are appended to sectionOrder if missing
               const newSecIds = customSections.map(c => c.id);
               const missingIds = newSecIds.filter(id => !sectionOrder.includes(id));
               if (missingIds.length > 0 && onUpdateSectionOrder) {
