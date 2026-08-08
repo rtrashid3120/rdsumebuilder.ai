@@ -29,6 +29,6 @@ mongoose.connect(MONGO_URI)
   .then(() => console.log(` Connected to MongoDB database: ${MONGO_URI}`))
   .catch((err) => console.log(` MongoDB Connection Warning: ${err.message}. Server running with local memory storage.`));
 
-app.listen(PORT, () => {
-  console.log(` ResumeBuilder.ai Express server listening on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(` ResumeBuilder.ai Express server listening on http://0.0.0.0:${PORT}`);
 });
