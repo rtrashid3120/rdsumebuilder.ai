@@ -1,8 +1,9 @@
-// AI Suggestion Helper - Extended with Job Description Skill Extraction & Keyword Gap Analysis
+// AI Suggestion Helper - Full Relative Proxy & Universal Keyword Extractor
 
 export const generateAISuggestions = async (text, jobTitle = "") => {
   try {
-    const response = await fetch("http://localhost:5000/api/suggest", {
+    // Relative URL fetch works on localhost:5173, localhost:5174, and network IP!
+    const response = await fetch("/api/suggest", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text, jobTitle })
@@ -10,20 +11,23 @@ export const generateAISuggestions = async (text, jobTitle = "") => {
     
     if (response.ok) {
       const data = await response.json();
-      return data;
+      if (data && (data.quantified || data.executive || data.concise)) {
+        return data;
+      }
     }
   } catch (err) {
-    console.log("Backend API offline. Using client AI generator fallback.");
+    console.log("API suggest fallback to client AI engine:", err.message);
   }
 
-  await new Promise((resolve) => setTimeout(resolve, 1200));
+  // Artificial AI processing delay for smooth UI experience
+  await new Promise((resolve) => setTimeout(resolve, 900));
 
   const trimmed = text.trim();
   if (!trimmed) {
     return {
-      quantified: "Architected end-to-end system features, increasing overall platform user engagement by 35% and cutting load times by 400ms.",
-      executive: "Spearheaded strategic technical initiatives, aligning engineering execution with business goals to boost revenue performance.",
-      concise: "Engineered scalable features and optimized platform performance across key services."
+      quantified: "Architected end-to-end system features for " + (jobTitle || "core product") + ", increasing platform throughput by 38% and cutting latency by 250ms.",
+      executive: "Spearheaded strategic technical initiatives, aligning engineering output with high-priority business goals to boost revenue scalability.",
+      concise: "Engineered scalable software modules and optimized core platform performance."
     };
   }
 
@@ -32,12 +36,12 @@ export const generateAISuggestions = async (text, jobTitle = "") => {
   let concise = "";
 
   if (trimmed.toLowerCase().includes("build") || trimmed.toLowerCase().includes("developed") || trimmed.toLowerCase().includes("code")) {
-    quantified = `Engineered robust, production-ready modules, reducing deployment cycle times by 30% and maintaining 99.9% uptime.`;
-    executive = `Directed core product development initiatives, collaborating with cross-functional partners to deliver key client milestones.`;
+    quantified = `Engineered robust, production-ready modules, reducing deployment cycle times by 35% and maintaining 99.9% uptime.`;
+    executive = `Directed core product development initiatives for ${jobTitle || 'engineering goals'}, delivering key milestones ahead of schedule.`;
     concise = `Developed key software components and streamlined deployment workflows.`;
   } else if (trimmed.toLowerCase().includes("manage") || trimmed.toLowerCase().includes("led") || trimmed.toLowerCase().includes("team")) {
-    quantified = `Led an agile team of 6+ engineers to deliver critical roadmap features 2 weeks ahead of schedule with zero high-severity bugs.`;
-    executive = `Orchestrated team performance and technical direction, fostering a high-velocity engineering culture.`;
+    quantified = `Led a high-velocity team of 6+ engineers to deliver critical roadmap features 2 weeks ahead of schedule with zero high-severity bugs.`;
+    executive = `Orchestrated team performance and technical direction, fostering a collaborative engineering culture.`;
     concise = `Managed engineering team operations and drove key project deliverables.`;
   } else if (trimmed.toLowerCase().includes("test") || trimmed.toLowerCase().includes("fix") || trimmed.toLowerCase().includes("bug")) {
     quantified = `Identified and resolved critical system bottlenecks, improving application throughput by 42% and eliminating 90%+ regression bugs.`;
@@ -52,9 +56,21 @@ export const generateAISuggestions = async (text, jobTitle = "") => {
   return { quantified, executive, concise };
 };
 
-// Feature #2: AI Job Description Keyword & Skill Gap Analyzer
+// Feature #2: AI Universal Job Description Keyword & Skill Gap Analyzer
 export const analyzeJobDescriptionSkills = async (jobDescriptionText, existingSkills = []) => {
-  await new Promise((resolve) => setTimeout(resolve, 1400));
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  if (!jobDescriptionText || !jobDescriptionText.trim()) {
+    return {
+      matchScore: 70,
+      recommendedSkills: [
+        { name: "TypeScript", category: "Language" },
+        { name: "Docker", category: "DevOps" },
+        { name: "GraphQL", category: "API" },
+        { name: "System Architecture", category: "Architecture" }
+      ]
+    };
+  }
 
   const commonKeywords = [
     { name: "React", category: "Frontend" },
@@ -71,7 +87,12 @@ export const analyzeJobDescriptionSkills = async (jobDescriptionText, existingSk
     { name: "CI/CD Pipelines", category: "DevOps" },
     { name: "System Design", category: "Architecture" },
     { name: "Agile / Scrum", category: "Methodology" },
-    { name: "Unit Testing (Jest)", category: "Testing" }
+    { name: "Unit Testing (Jest)", category: "Testing" },
+    { name: "REST API", category: "API" },
+    { name: "Redux", category: "State" },
+    { name: "Next.js", category: "Framework" },
+    { name: "Java", category: "Language" },
+    { name: "Go", category: "Language" }
   ];
 
   const jdLower = jobDescriptionText.toLowerCase();
@@ -79,37 +100,26 @@ export const analyzeJobDescriptionSkills = async (jobDescriptionText, existingSk
   // Existing skills normalizer
   const existingNames = existingSkills.map(s => typeof s === 'string' ? s.toLowerCase() : s.name.toLowerCase());
 
-  // Find matches in JD that are missing from candidate's skills
+  // Extracted matched keywords
   const extracted = commonKeywords.filter(kw => {
-    const inJD = jdLower.includes(kw.name.toLowerCase()) || 
-                 (kw.name === "React" && jdLower.includes("react")) ||
-                 (kw.name === "AWS" && jdLower.includes("aws")) ||
-                 (kw.name === "Python" && jdLower.includes("python")) ||
-                 (kw.name === "Docker" && jdLower.includes("docker"));
-    
+    const inJD = jdLower.includes(kw.name.toLowerCase());
     const alreadyAdded = existingNames.some(name => name.includes(kw.name.toLowerCase()));
     return inJD && !alreadyAdded;
   });
 
-  // If JD is arbitrary or sparse, suggest 4 high-value default keywords
-  if (extracted.length === 0) {
-    const fallbackList = [
+  // Calculate dynamic match score
+  const matchedCount = commonKeywords.filter(kw => jdLower.includes(kw.name.toLowerCase()) && existingNames.some(name => name.includes(kw.name.toLowerCase()))).length;
+  const totalInJD = commonKeywords.filter(kw => jdLower.includes(kw.name.toLowerCase())).length;
+  
+  const matchScore = totalInJD > 0 ? Math.round((matchedCount / totalInJD) * 100) : 75;
+
+  return {
+    matchScore: Math.max(50, Math.min(98, matchScore)),
+    recommendedSkills: extracted.length > 0 ? extracted : [
       { name: "GraphQL", category: "API" },
       { name: "Docker", category: "DevOps" },
       { name: "System Design", category: "Architecture" },
       { name: "CI/CD Pipelines", category: "DevOps" }
-    ].filter(kw => !existingNames.some(n => n.includes(kw.name.toLowerCase())));
-
-    return {
-      matchScore: 82,
-      recommendedSkills: fallbackList
-    };
-  }
-
-  const matchScore = Math.min(95, 60 + (existingSkills.length * 3));
-
-  return {
-    matchScore,
-    recommendedSkills: extracted
+    ].filter(kw => !existingNames.some(n => n.includes(kw.name.toLowerCase())))
   };
 };
