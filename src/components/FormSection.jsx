@@ -8,7 +8,7 @@ import ProjectsForm from './ProjectsForm';
 import CustomSectionsForm from './CustomSectionsForm';
 
 export default function FormSection({ 
-  resume, 
+  resume = {}, 
   onChange, 
   onOpenAIModal, 
   sectionOrder = ['summary', 'education', 'experience', 'projects', 'skills'],
@@ -265,14 +265,15 @@ export default function FormSection({
 
         {activeTab === 'custom' && (
           <CustomSectionsForm
-            customSections={resume.customSections || []}
-            onChange={(customSections) => {
-              const newSecIds = customSections.map(c => c.id);
+            resume={resume}
+            onChange={(updatedResume) => {
+              const newSecs = updatedResume?.customSections || [];
+              const newSecIds = newSecs.map(c => c.id);
               const missingIds = newSecIds.filter(id => !sectionOrder.includes(id));
               if (missingIds.length > 0 && onUpdateSectionOrder) {
                 onUpdateSectionOrder([...sectionOrder, ...missingIds]);
               }
-              onChange({ ...resume, customSections });
+              onChange(updatedResume);
             }}
             onOpenAIModal={onOpenAIModal}
           />

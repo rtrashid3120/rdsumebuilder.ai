@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Plus, Trash2, Sparkles, Award, Globe, Heart, BookOpen, Mic, LayoutGrid, Check, FolderPlus } from 'lucide-react';
-import { generateAISuggestions } from '../utils/aiEnhancer';
 
-export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) {
+export default function CustomSectionsForm({ resume = {}, customSections: passedCustomSections, onChange, onOpenAIModal }) {
   const [newTitle, setNewTitle] = useState('');
-  const [newType, setNewType] = useState('itemList'); // itemList, badgeGrid, bulletList
+  const [newType, setNewType] = useState('itemList');
   const [activeSectionId, setActiveSectionId] = useState(null);
 
-  const customSections = resume.customSections || [];
+  const customSections = Array.isArray(passedCustomSections) 
+    ? passedCustomSections 
+    : (resume?.customSections || []);
 
   const presetTemplates = [
     { title: 'Certifications & Licenses', icon: Award, type: 'itemList', defaultItem: { title: 'AWS Certified Solutions Architect', subtitle: 'Amazon Web Services', date: '2024', description: 'Credential ID: AWS-892347' } },
@@ -16,6 +17,16 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
     { title: 'Publications & Papers', icon: BookOpen, type: 'itemList', defaultItem: { title: 'Scalable Microservices Architecture', subtitle: 'IEEE Software Journal', date: '2023', description: 'Co-authored research paper on serverless edge computing.' } },
     { title: 'Speaking & Conferences', icon: Mic, type: 'itemList', defaultItem: { title: 'Keynote Speaker at ReactConf', subtitle: 'React Global Summit', date: '2023', description: 'Delivered presentation on Next.js Server Components to 1,500+ attendees.' } },
   ];
+
+  const handleUpdate = (updatedSections) => {
+    if (typeof onChange === 'function') {
+      if (passedCustomSections) {
+        onChange(updatedSections);
+      } else {
+        onChange({ ...resume, customSections: updatedSections });
+      }
+    }
+  };
 
   const handleAddSection = (titleToAdd, typeToAdd, defaultItemToUse) => {
     const title = titleToAdd || newTitle.trim();
@@ -29,19 +40,15 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
       items: defaultItemToUse ? [ { ...defaultItemToUse, id: `item-${Date.now()}` } ] : []
     };
 
-    const updated = {
-      ...resume,
-      customSections: [...customSections, newSec]
-    };
-
-    onChange(updated);
+    const updatedSections = [...customSections, newSec];
+    handleUpdate(updatedSections);
     setActiveSectionId(newSecId);
     setNewTitle('');
   };
 
   const handleRemoveSection = (secId) => {
     const updatedSections = customSections.filter(s => s.id !== secId);
-    onChange({ ...resume, customSections: updatedSections });
+    handleUpdate(updatedSections);
     if (activeSectionId === secId) {
       setActiveSectionId(updatedSections[0]?.id || null);
     }
@@ -51,17 +58,17 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
     const updatedSections = customSections.map(sec => {
       if (sec.id === secId) {
         const newItem = { id: `item-${Date.now()}`, title: '', subtitle: '', date: '', description: '' };
-        return { ...sec, items: [...sec.items, newItem] };
+        return { ...sec, items: [...(sec.items || []), newItem] };
       }
       return sec;
     });
-    onChange({ ...resume, customSections: updatedSections });
+    handleUpdate(updatedSections);
   };
 
   const handleUpdateItem = (secId, itemId, field, value) => {
     const updatedSections = customSections.map(sec => {
       if (sec.id === secId) {
-        const updatedItems = sec.items.map(item => {
+        const updatedItems = (sec.items || []).map(item => {
           if (item.id === itemId) {
             return { ...item, [field]: value };
           }
@@ -71,17 +78,17 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
       }
       return sec;
     });
-    onChange({ ...resume, customSections: updatedSections });
+    handleUpdate(updatedSections);
   };
 
   const handleRemoveItem = (secId, itemId) => {
     const updatedSections = customSections.map(sec => {
       if (sec.id === secId) {
-        return { ...sec, items: sec.items.filter(item => item.id !== itemId) };
+        return { ...sec, items: (sec.items || []).filter(item => item.id !== itemId) };
       }
       return sec;
     });
-    onChange({ ...resume, customSections: updatedSections });
+    handleUpdate(updatedSections);
   };
 
   const activeSection = customSections.find(s => s.id === activeSectionId) || customSections[0];
@@ -89,7 +96,7 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
   return (
     <div className="space-y-5 text-white">
       
-      {/* 1. Perfect 1-Click Preset Templates Grid (No Truncation) */}
+      {/* 1. Preset Templates Grid */}
       <div className="bg-slate-900/90 border border-slate-800 p-4 sm:p-5 rounded-2xl shadow-xl space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -101,7 +108,7 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
           <span className="text-[11px] font-bold text-amber-400">1-Click Presets</span>
         </div>
 
-        {/* Preset Buttons Wrap Naturally */}
+        {/* Preset Buttons */}
         <div className="flex flex-wrap gap-2">
           {presetTemplates.map((preset) => {
             const Icon = preset.icon;
@@ -126,7 +133,7 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
           })}
         </div>
 
-        {/* 2. Responsive Custom Title & Type Creator Input Row */}
+        {/* Custom Title Input */}
         <div className="pt-2 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-12 gap-2.5 items-center">
           <div className="md:col-span-6">
             <input
@@ -163,7 +170,7 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
         </div>
       </div>
 
-      {/* 3. Created Section Tabs */}
+      {/* Created Section Tabs */}
       {customSections.length > 0 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar border-b border-slate-800">
           {customSections.map((sec) => {
@@ -197,7 +204,7 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
         </div>
       )}
 
-      {/* 4. Active Section Editor Item Cards with Perfect Grid Layout */}
+      {/* Active Section Editor */}
       {activeSection && (
         <div className="bg-slate-900/90 border border-slate-800 p-4 sm:p-5 rounded-2xl shadow-xl space-y-4">
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -218,9 +225,8 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
             </button>
           </div>
 
-          {/* Item List Cards */}
           <div className="space-y-3">
-            {activeSection.items.map((item, idx) => (
+            {(activeSection.items || []).map((item, idx) => (
               <div key={item.id || idx} className="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-3 relative group">
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
@@ -234,7 +240,6 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
                   </button>
                 </div>
 
-                {/* Grid Fields with Generous Widths */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-[10px] font-bold text-slate-400 mb-1">Title / Role / Name</label>
@@ -276,7 +281,6 @@ export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) 
                   )}
                 </div>
 
-                {/* Description for Item List */}
                 {activeSection.type === 'itemList' && (
                   <div>
                     <div className="flex items-center justify-between mb-1">
