@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import CoverLetterPreview from './CoverLetterPreview';
 import { Sparkles, Download, Copy, Check, X, Building2, Briefcase, FileSignature } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
-import { exportAsDocx } from '../utils/exportHelpers';
 
 export default function CoverLetterModal({ 
   isOpen, 
@@ -28,7 +27,7 @@ export default function CoverLetterModal({
     letterText: `Dear Hiring Team,\n\nI am writing to express my enthusiastic interest in the ${resume.personalInfo?.jobTitle || 'Senior Engineer'} position at Nexus AI Labs. Having followed your company's technical innovations, I am excited about the prospect of bringing my experience to your engineering team.\n\nThroughout my career, I have specialized in building high-throughput systems, optimizing backend performance, and collaborating closely with product teams. At my previous roles, I successfully engineered scalable features that improved platform performance by over 35% while maintaining strict quality standards.\n\nI am particularly drawn to Nexus AI Labs because of your commitment to building cutting-edge tools. I would welcome the opportunity to discuss how my technical expertise and passion for engineering excellence can contribute to your upcoming goals.\n\nThank you for your time and consideration.`
   });
 
-  // Request 1 Fix: Click-Outside Modal Backdrop Handler
+  // Click-Outside Modal Backdrop Handler
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalBoxRef.current && !modalBoxRef.current.contains(event.target)) {
@@ -95,7 +94,7 @@ export default function CoverLetterModal({
     setIsGenerating(false);
   };
 
-  // Request 1 Fix: 1-Click Copy Cover Letter Text to Clipboard
+  // 1-Click Copy Cover Letter Text to Clipboard
   const handleCopyText = () => {
     if (coverLetterData.letterText) {
       navigator.clipboard.writeText(coverLetterData.letterText);
@@ -104,17 +103,45 @@ export default function CoverLetterModal({
     }
   };
 
-  // 1-Click PDF Export
+  // Direct 1-Click Vector PDF Export Handler
   const handleDownloadPDF = () => {
     const element = document.getElementById('printable-cover-letter');
     if (!element) return;
 
+    const nameSlug = (resume.personalInfo?.fullName || 'Cover_Letter').replace(/\s+/g, '_');
     const opt = {
       margin: 0,
-      filename: `${(resume.personalInfo?.fullName || 'Cover_Letter').replace(/\s+/g, '_')}_Cover_Letter.pdf`,
+      filename: `${nameSlug}_Cover_Letter.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true, 
+        logging: false,
+        onclone: (clonedDoc) => {
+          const printable = clonedDoc.getElementById('printable-cover-letter');
+          if (printable) {
+            printable.style.backgroundColor = '#ffffff';
+            printable.style.color = '#0f172a';
+            const allElements = printable.getElementsByTagName('*');
+            for (let el of allElements) {
+              const bg = el.style.backgroundColor;
+              const col = el.style.color;
+              const border = el.style.borderColor;
+
+              if (bg && (bg.includes('oklch') || bg.includes('oklab'))) {
+                el.style.backgroundColor = '#ffffff';
+              }
+              if (col && (col.includes('oklch') || col.includes('oklab'))) {
+                el.style.color = '#0f172a';
+              }
+              if (border && (border.includes('oklch') || border.includes('oklab'))) {
+                el.style.borderColor = '#e2e8f0';
+              }
+            }
+          }
+        }
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
     };
 
     html2pdf().set(opt).from(element).save();
@@ -126,10 +153,10 @@ export default function CoverLetterModal({
         ref={modalBoxRef}
         className="relative w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] text-white"
       >
-        {/* Header Bar with Download & Copy Actions */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800 bg-slate-950">
+        {/* Top Header Bar with High-Visibility Action Buttons */}
+        <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 border-b border-slate-800 bg-slate-950">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 via-amber-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-red-600/30">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 via-amber-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-red-600/30 shrink-0">
               <FileSignature className="w-5 h-5 text-black" />
             </div>
             <div>
@@ -140,45 +167,47 @@ export default function CoverLetterModal({
             </div>
           </div>
 
+          {/* Action Buttons in Top Corner */}
           <div className="flex items-center gap-2">
             {/* Copy Button */}
             <button
               onClick={handleCopyText}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-md ${
                 copied 
                   ? 'bg-emerald-600 text-white' 
-                  : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
+                  : 'bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700'
               }`}
-              title="Copy Cover Letter Text"
+              title="Copy Cover Letter Text to Clipboard"
             >
               {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5 text-yellow-400" />}
-              <span>{copied ? 'Copied!' : 'Copy Text'}</span>
+              <span>{copied ? 'Copied to Clipboard!' : '📋 Copy Text'}</span>
             </button>
 
-            {/* Download PDF Button */}
+            {/* Direct 1-Click PDF Download Button */}
             <button
               onClick={handleDownloadPDF}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-xs font-bold text-white shadow-md cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 hover:from-red-500 hover:to-yellow-400 text-xs font-black text-black shadow-lg shadow-red-600/30 transition-all cursor-pointer"
+              title="Download Cover Letter PDF directly"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>Download PDF</span>
+              <Download className="w-3.5 h-3.5 text-black" />
+              <span>📄 Download PDF</span>
             </button>
 
             {/* Close Button */}
             <button 
               onClick={onClose}
               className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer ml-1"
-              title="Close (or click outside)"
+              title="Close window (or click outside)"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        {/* Modal Content */}
+        {/* Modal Content Split Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 flex-1 overflow-hidden">
           
-          {/* Left Form Panel */}
+          {/* Left Controls Panel */}
           <div className="lg:col-span-5 p-5 space-y-4 overflow-y-auto border-r border-slate-800 bg-slate-950/60">
             <div className="space-y-3">
               <div>
@@ -231,10 +260,20 @@ export default function CoverLetterModal({
               </button>
             </div>
 
-            <div className="pt-2 border-t border-slate-800 space-y-1">
-              <label className="block text-xs font-bold text-slate-300">
-                Edit Cover Letter Text Directly:
-              </label>
+            {/* Editable Text Area */}
+            <div className="pt-2 border-t border-slate-800 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-bold text-slate-300">
+                  Edit Cover Letter Text Directly:
+                </label>
+                <button
+                  onClick={handleCopyText}
+                  className="text-[11px] font-bold text-yellow-400 hover:text-yellow-300 flex items-center gap-1 cursor-pointer"
+                >
+                  {copied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  <span>{copied ? 'Copied!' : 'Copy'}</span>
+                </button>
+              </div>
               <textarea
                 rows={7}
                 value={coverLetterData.letterText}
@@ -244,8 +283,8 @@ export default function CoverLetterModal({
             </div>
           </div>
 
-          {/* Right Live Preview Canvas */}
-          <div className="lg:col-span-7 p-6 overflow-y-auto bg-slate-900/40 flex justify-center items-start">
+          {/* Right Live Preview Canvas with Floating Bottom-Right Action Bar */}
+          <div className="lg:col-span-7 p-6 overflow-y-auto bg-slate-900/40 flex justify-center items-start relative">
             <CoverLetterPreview
               personalInfo={resume.personalInfo}
               coverLetterData={coverLetterData}
@@ -253,6 +292,29 @@ export default function CoverLetterModal({
               fontFamily={fontFamily}
               template={template}
             />
+
+            {/* Sticky Floating Bottom Action Bar Inside Preview Pane */}
+            <div className="sticky bottom-4 z-20 flex items-center gap-2 bg-slate-950/90 border border-slate-800 p-2 rounded-2xl shadow-2xl backdrop-blur-md">
+              <button
+                onClick={handleCopyText}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  copied 
+                    ? 'bg-emerald-600 text-white' 
+                    : 'bg-slate-900 hover:bg-slate-800 text-yellow-400 border border-slate-700'
+                }`}
+              >
+                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5 text-yellow-400" />}
+                <span>{copied ? 'Copied!' : 'Copy Text'}</span>
+              </button>
+
+              <button
+                onClick={handleDownloadPDF}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 hover:from-red-500 hover:to-yellow-400 text-xs font-black text-black shadow-lg shadow-red-600/30 transition-all cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5 text-black" />
+                <span>📄 Download PDF</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
