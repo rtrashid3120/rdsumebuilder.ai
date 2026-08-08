@@ -53,11 +53,11 @@ body {
   scrollbar-width: none;
 }
 
-/* A4 Printable Canvas Dimensions - Pure Hex Colors to Prevent html2canvas oklch crash */
+/* STRICT STANDARD A4 DIMENSIONS (210mm x 297mm = 794px x 1123px @ 96DPI) */
 .page-a4, #printable-resume, #printable-cover-letter {
-  width: 100%;
-  max-width: 800px;
-  min-height: 1130px;
+  width: 210mm !important;
+  min-height: 297mm !important;
+  max-width: 210mm !important;
   background-color: #ffffff !important;
   color: #0f172a !important;
   border-color: #e2e8f0 !important;
@@ -65,19 +65,13 @@ body {
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
+  margin: 0 auto;
 }
 
 /* Explicit RGB/Hex Overrides inside printable canvases to prevent html2canvas OKLCH parsing error */
 #printable-resume *, #printable-cover-letter * {
   color: inherit;
   border-color: inherit;
-}
-
-@media (min-width: 1024px) {
-  .page-a4 {
-    width: 210mm;
-    min-height: 297mm;
-  }
 }
 
 /* Smooth Animations */
@@ -99,7 +93,7 @@ body {
   animation: fadeIn 0.15s ease-out forwards;
 }
 
-/* STRICT PRINT CSS: Hide EVERYTHING except the exact printable resume canvas */
+/* STRICT PRINT CSS: Hide EVERYTHING except the exact printable A4 resume canvas */
 @media print {
   body {
     background: #ffffff !important;
@@ -120,8 +114,9 @@ body {
   #printable-resume, #printable-cover-letter {
     display: block !important;
     visibility: visible !important;
-    width: 100% !important;
-    max-width: 100% !important;
+    width: 210mm !important;
+    height: 297mm !important;
+    max-width: 210mm !important;
     box-shadow: none !important;
     border: none !important;
     margin: 0 !important;
@@ -133,7 +128,7 @@ body {
   }
 
   @page {
-    size: A4;
-    margin: 10mm;
+    size: A4 portrait;
+    margin: 0;
   }
 }

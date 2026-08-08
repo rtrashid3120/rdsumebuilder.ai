@@ -1,379 +1,316 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Sparkles, Award, Layers, Globe, BookOpen, ShieldCheck, Heart, Volume2 } from 'lucide-react';
+import { Plus, Trash2, Sparkles, Award, Globe, Heart, BookOpen, Mic, LayoutGrid, Check, FolderPlus } from 'lucide-react';
+import { generateAISuggestions } from '../utils/aiEnhancer';
 
-export default function CustomSectionsForm({ customSections = [], onChange, onOpenAIModal }) {
-  const [activeSectionId, setActiveSectionId] = useState(customSections[0]?.id || null);
-  const [newSectionTitle, setNewSectionTitle] = useState('');
-  const [newSectionType, setNewSectionType] = useState('itemList');
+export default function CustomSectionsForm({ resume, onChange, onOpenAIModal }) {
+  const [newTitle, setNewTitle] = useState('');
+  const [newType, setNewType] = useState('itemList'); // itemList, badgeGrid, bulletList
+  const [activeSectionId, setActiveSectionId] = useState(null);
 
-  const presets = [
-    { 
-      title: "Certifications & Licenses", 
-      type: "itemList",
-      icon: ShieldCheck,
-      defaultItems: [
-        { id: `item-1`, title: "AWS Certified Solutions Architect", subtitle: "Amazon Web Services", date: "2024", description: "Credential ID: AWS-892347" }
-      ]
-    },
-    { 
-      title: "Languages Spoken", 
-      type: "badgeGrid",
-      icon: Globe,
-      defaultItems: [
-        { id: `item-1`, title: "English", subtitle: "Native / Fluent" },
-        { id: `item-2`, title: "Spanish", subtitle: "Professional Working" }
-      ]
-    },
-    { 
-      title: "Volunteer Work", 
-      type: "itemList",
-      icon: Heart,
-      defaultItems: [
-        { id: `item-1`, title: "STEM Mentor", subtitle: "Code.org", date: "2023 - Present", description: "Mentored high school students in introductory Python & Web Development." }
-      ]
-    },
-    { 
-      title: "Publications & Patents", 
-      type: "itemList",
-      icon: BookOpen,
-      defaultItems: [
-        { id: `item-1`, title: "High-Throughput Microservice Caching Patterns", subtitle: "IEEE Tech Journal", date: "2023", description: "Published research on Redis caching optimization strategies." }
-      ]
-    },
-    { 
-      title: "Speaking Engagements", 
-      type: "itemList",
-      icon: Volume2,
-      defaultItems: [
-        { id: `item-1`, title: "Keynote: Scaling React Apps", subtitle: "JSConf Global", date: "2024", description: "Presented architecture patterns for enterprise React applications." }
-      ]
-    }
+  const customSections = resume.customSections || [];
+
+  const presetTemplates = [
+    { title: 'Certifications & Licenses', icon: Award, type: 'itemList', defaultItem: { title: 'AWS Certified Solutions Architect', subtitle: 'Amazon Web Services', date: '2024', description: 'Credential ID: AWS-892347' } },
+    { title: 'Languages Spoken', icon: Globe, type: 'badgeGrid', defaultItem: { title: 'English', subtitle: 'Native / Fluent' } },
+    { title: 'Volunteer Work', icon: Heart, type: 'itemList', defaultItem: { title: 'STEM Mentor', subtitle: 'Code.org', date: '2022 - Present', description: 'Mentored 20+ high school students in modern JavaScript and Python fundamentals.' } },
+    { title: 'Publications & Papers', icon: BookOpen, type: 'itemList', defaultItem: { title: 'Scalable Microservices Architecture', subtitle: 'IEEE Software Journal', date: '2023', description: 'Co-authored research paper on serverless edge computing.' } },
+    { title: 'Speaking & Conferences', icon: Mic, type: 'itemList', defaultItem: { title: 'Keynote Speaker at ReactConf', subtitle: 'React Global Summit', date: '2023', description: 'Delivered presentation on Next.js Server Components to 1,500+ attendees.' } },
   ];
 
-  // Add a new Custom Section with optional default pre-populated items
-  const handleAddSection = (presetTitle, presetType, defaultItems) => {
-    const title = presetTitle || newSectionTitle.trim();
+  const handleAddSection = (titleToAdd, typeToAdd, defaultItemToUse) => {
+    const title = titleToAdd || newTitle.trim();
     if (!title) return;
 
-    // Prevent exact duplicates
-    const alreadyExists = customSections.some(s => s.title.toLowerCase() === title.toLowerCase());
-    if (alreadyExists) {
-      const existing = customSections.find(s => s.title.toLowerCase() === title.toLowerCase());
-      if (existing) setActiveSectionId(existing.id);
-      return;
-    }
-
-    const initialItems = defaultItems ? defaultItems.map(item => ({ ...item, id: `item-${Date.now()}-${Math.random()}` })) : [
-      { id: `item-${Date.now()}`, title: "", subtitle: "", date: "", description: "" }
-    ];
-
+    const newSecId = `custom-sec-${Date.now()}`;
     const newSec = {
-      id: `custom-sec-${Date.now()}`,
-      title: title,
-      type: presetType || newSectionType,
-      items: initialItems
+      id: newSecId,
+      title,
+      type: typeToAdd || newType,
+      items: defaultItemToUse ? [ { ...defaultItemToUse, id: `item-${Date.now()}` } ] : []
     };
 
-    const updated = [...customSections, newSec];
+    const updated = {
+      ...resume,
+      customSections: [...customSections, newSec]
+    };
+
     onChange(updated);
-    setActiveSectionId(newSec.id);
-    setNewSectionTitle('');
+    setActiveSectionId(newSecId);
+    setNewTitle('');
   };
 
   const handleRemoveSection = (secId) => {
-    const updated = customSections.filter(s => s.id !== secId);
-    onChange(updated);
+    const updatedSections = customSections.filter(s => s.id !== secId);
+    onChange({ ...resume, customSections: updatedSections });
     if (activeSectionId === secId) {
-      setActiveSectionId(updated[0]?.id || null);
+      setActiveSectionId(updatedSections[0]?.id || null);
     }
   };
 
   const handleAddItem = (secId) => {
-    const updated = customSections.map(sec => {
+    const updatedSections = customSections.map(sec => {
       if (sec.id === secId) {
-        return {
-          ...sec,
-          items: [
-            ...sec.items,
-            {
-              id: `item-${Date.now()}`,
-              title: "",
-              subtitle: "",
-              date: "",
-              description: ""
-            }
-          ]
-        };
+        const newItem = { id: `item-${Date.now()}`, title: '', subtitle: '', date: '', description: '' };
+        return { ...sec, items: [...sec.items, newItem] };
       }
       return sec;
     });
-    onChange(updated);
+    onChange({ ...resume, customSections: updatedSections });
   };
 
-  const handleUpdateItem = (secId, itemIndex, field, value) => {
-    const updated = customSections.map(sec => {
+  const handleUpdateItem = (secId, itemId, field, value) => {
+    const updatedSections = customSections.map(sec => {
       if (sec.id === secId) {
-        const newItems = [...sec.items];
-        newItems[itemIndex] = {
-          ...newItems[itemIndex],
-          [field]: value
-        };
-        return { ...sec, items: newItems };
+        const updatedItems = sec.items.map(item => {
+          if (item.id === itemId) {
+            return { ...item, [field]: value };
+          }
+          return item;
+        });
+        return { ...sec, items: updatedItems };
       }
       return sec;
     });
-    onChange(updated);
+    onChange({ ...resume, customSections: updatedSections });
   };
 
-  const handleRemoveItem = (secId, itemIndex) => {
-    const updated = customSections.map(sec => {
+  const handleRemoveItem = (secId, itemId) => {
+    const updatedSections = customSections.map(sec => {
       if (sec.id === secId) {
-        return {
-          ...sec,
-          items: sec.items.filter((_, idx) => idx !== itemIndex)
-        };
+        return { ...sec, items: sec.items.filter(item => item.id !== itemId) };
       }
       return sec;
     });
-    onChange(updated);
+    onChange({ ...resume, customSections: updatedSections });
   };
 
   const activeSection = customSections.find(s => s.id === activeSectionId) || customSections[0];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 text-white">
       
-      {/* 1. Quick Presets Bar - Highly Adaptive */}
-      <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl space-y-3 shadow-md">
+      {/* 1. Perfect 1-Click Preset Templates Grid (No Truncation) */}
+      <div className="bg-slate-900/90 border border-slate-800 p-4 sm:p-5 rounded-2xl shadow-xl space-y-4">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-            <Layers className="w-4 h-4 text-indigo-400" />
-            Add Custom Resume Section
-          </span>
-          <span className="text-[11px] text-indigo-400 font-semibold">1-Click Presets</span>
+          <div className="flex items-center gap-2">
+            <FolderPlus className="w-4 h-4 text-red-500" />
+            <h3 className="text-xs font-black text-white uppercase tracking-wider">
+              Add Custom Resume Section
+            </h3>
+          </div>
+          <span className="text-[11px] font-bold text-amber-400">1-Click Presets</span>
         </div>
 
-        {/* Preset Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {presets.map((p) => {
-            const Icon = p.icon;
-            const isAdded = customSections.some(s => s.title.toLowerCase() === p.title.toLowerCase());
+        {/* Preset Buttons Wrap Naturally */}
+        <div className="flex flex-wrap gap-2">
+          {presetTemplates.map((preset) => {
+            const Icon = preset.icon;
+            const isAlreadyAdded = customSections.some(s => s.title.toLowerCase() === preset.title.toLowerCase());
+
             return (
               <button
-                key={p.title}
-                type="button"
-                onClick={() => handleAddSection(p.title, p.type, p.defaultItems)}
-                className={`flex items-center gap-2 p-2.5 rounded-xl border text-left text-xs font-semibold transition-all cursor-pointer ${
-                  isAdded
-                    ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-300'
-                    : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-indigo-500/60 hover:bg-slate-900'
+                key={preset.title}
+                onClick={() => !isAlreadyAdded && handleAddSection(preset.title, preset.type, preset.defaultItem)}
+                disabled={isAlreadyAdded}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  isAlreadyAdded
+                    ? 'bg-slate-950 text-slate-500 border border-slate-800 cursor-not-allowed opacity-60'
+                    : 'bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-red-500/50 hover:text-yellow-400 shadow-sm'
                 }`}
               >
-                <Icon className="w-4 h-4 text-indigo-400 shrink-0" />
-                <span className="truncate">{p.title}</span>
+                <Icon className={`w-3.5 h-3.5 ${isAlreadyAdded ? 'text-slate-600' : 'text-yellow-400'}`} />
+                <span>{preset.title}</span>
+                {isAlreadyAdded && <Check className="w-3 h-3 text-emerald-400 ml-1" />}
               </button>
             );
           })}
         </div>
 
-        {/* Custom Section Title Entry */}
-        <div className="pt-2 border-t border-slate-800/80 flex flex-col sm:flex-row gap-2">
-          <input
-            type="text"
-            value={newSectionTitle}
-            onChange={(e) => setNewSectionTitle(e.target.value)}
-            placeholder="Or type custom title (e.g. Honors & Awards, Hobbies)..."
-            className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
-          />
-          <select
-            value={newSectionType}
-            onChange={(e) => setNewSectionType(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500 cursor-pointer"
-          >
-            <option value="itemList">Item List (Title + Date + Desc)</option>
-            <option value="badgeGrid">Badge Grid (Key + Value)</option>
-            <option value="bulletList">Freeform Bullets</option>
-          </select>
-          <button
-            onClick={() => handleAddSection()}
-            disabled={!newSectionTitle.trim()}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-md transition-all disabled:opacity-50 cursor-pointer whitespace-nowrap"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create Section</span>
-          </button>
+        {/* 2. Responsive Custom Title & Type Creator Input Row */}
+        <div className="pt-2 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-12 gap-2.5 items-center">
+          <div className="md:col-span-6">
+            <input
+              type="text"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="Or type custom title (e.g. Awards, Patents)..."
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500"
+            />
+          </div>
+
+          <div className="md:col-span-4">
+            <select
+              value={newType}
+              onChange={(e) => setNewType(e.target.value)}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-red-500 cursor-pointer"
+            >
+              <option value="itemList">Item List (Title + Date + Desc)</option>
+              <option value="badgeGrid">Badge Grid (Skill / Language)</option>
+              <option value="bulletList">Bullet Points</option>
+            </select>
+          </div>
+
+          <div className="md:col-span-2">
+            <button
+              onClick={() => handleAddSection()}
+              disabled={!newTitle.trim()}
+              className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-red-600 to-amber-500 hover:from-red-500 hover:to-yellow-400 text-xs font-black text-black transition-all disabled:opacity-40 cursor-pointer shadow-md"
+            >
+              <Plus className="w-4 h-4 text-black" />
+              <span>Add</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* 2. Active Custom Sections Tabs */}
+      {/* 3. Created Section Tabs */}
       {customSections.length > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 border-b border-slate-800">
-            {customSections.map((sec) => (
-              <div key={sec.id} className="flex items-center shrink-0">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar border-b border-slate-800">
+          {customSections.map((sec) => {
+            const isActive = activeSection?.id === sec.id;
+            return (
+              <div key={sec.id} className="flex items-center">
                 <button
-                  type="button"
                   onClick={() => setActiveSectionId(sec.id)}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    (activeSection?.id === sec.id)
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
-                      : 'bg-slate-900 text-slate-300 border border-slate-800 hover:bg-slate-800'
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    isActive
+                      ? 'bg-red-600 text-white shadow-md'
+                      : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
                   }`}
                 >
                   <span>{sec.title}</span>
-                  <span className="text-[10px] opacity-70">({sec.items.length})</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-black/40 text-yellow-400">
+                    {sec.items?.length || 0}
+                  </span>
                 </button>
+
                 <button
                   onClick={() => handleRemoveSection(sec.id)}
-                  className="p-1 text-slate-500 hover:text-red-400 transition-colors ml-1 cursor-pointer"
-                  title="Delete Section"
+                  className="p-1 rounded-lg text-slate-500 hover:text-red-400 hover:bg-slate-900 transition-colors ml-1"
+                  title={`Delete ${sec.title}`}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
-            ))}
+            );
+          })}
+        </div>
+      )}
+
+      {/* 4. Active Section Editor Item Cards with Perfect Grid Layout */}
+      {activeSection && (
+        <div className="bg-slate-900/90 border border-slate-800 p-4 sm:p-5 rounded-2xl shadow-xl space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div>
+              <h4 className="text-xs font-extrabold text-white flex items-center gap-2">
+                <LayoutGrid className="w-4 h-4 text-amber-400" />
+                Editing: <span className="text-yellow-400 font-black">{activeSection.title}</span>
+              </h4>
+              <p className="text-[10px] text-slate-400 mt-0.5 capitalize">Format: {activeSection.type}</p>
+            </div>
+
+            <button
+              onClick={() => handleAddItem(activeSection.id)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-bold text-yellow-400 border border-slate-700 transition-all cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add Item</span>
+            </button>
           </div>
 
-          {/* Active Section Editor */}
-          {activeSection && (
-            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 md:p-5 space-y-4 shadow-lg">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 className="text-xs md:text-sm font-bold text-white flex items-center gap-2">
-                  <Award className="w-4 h-4 text-amber-400" />
-                  Editing: <span className="text-indigo-400">{activeSection.title}</span>
-                </h3>
-                <span className="text-[11px] text-slate-400 capitalize">
-                  Layout: {activeSection.type === 'itemList' ? 'Item List' : activeSection.type === 'badgeGrid' ? 'Badge Grid' : 'Bullets'}
-                </span>
-              </div>
-
-              {activeSection.items.length === 0 && (
-                <div className="text-center py-6 border border-dashed border-slate-800 rounded-xl">
-                  <p className="text-xs text-slate-400">No items added to "{activeSection.title}" yet.</p>
+          {/* Item List Cards */}
+          <div className="space-y-3">
+            {activeSection.items.map((item, idx) => (
+              <div key={item.id || idx} className="bg-slate-950 border border-slate-800 p-3.5 rounded-xl space-y-3 relative group">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                    Item #{idx + 1}
+                  </span>
+                  <button
+                    onClick={() => handleRemoveItem(activeSection.id, item.id)}
+                    className="text-slate-500 hover:text-red-400 p-1 rounded hover:bg-slate-900 transition-colors"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
-              )}
 
-              {activeSection.items.map((item, itemIdx) => (
-                <div key={item.id || itemIdx} className="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3 relative">
-                  <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
-                    <span className="text-[11px] font-bold text-indigo-400">Item #{itemIdx + 1}</span>
-                    <button
-                      onClick={() => handleRemoveItem(activeSection.id, itemIdx)}
-                      className="text-slate-500 hover:text-red-400 transition-colors cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                {/* Grid Fields with Generous Widths */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold text-slate-400 mb-1">Title / Role / Name</label>
+                    <input
+                      type="text"
+                      value={item.title || ''}
+                      onChange={(e) => handleUpdateItem(activeSection.id, item.id, 'title', e.target.value)}
+                      placeholder="e.g. AWS Certified"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-red-500"
+                    />
                   </div>
 
-                  {activeSection.type === 'itemList' && (
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div>
-                          <label className="block text-[11px] font-semibold text-slate-400 mb-1">Title / Role / Name</label>
-                          <input
-                            type="text"
-                            value={item.title || ''}
-                            onChange={(e) => handleUpdateItem(activeSection.id, itemIdx, 'title', e.target.value)}
-                            placeholder="e.g. AWS Solutions Architect"
-                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] font-semibold text-slate-400 mb-1">Issuer / Organization</label>
-                          <input
-                            type="text"
-                            value={item.subtitle || ''}
-                            onChange={(e) => handleUpdateItem(activeSection.id, itemIdx, 'subtitle', e.target.value)}
-                            placeholder="e.g. Amazon Web Services"
-                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-[11px] font-semibold text-slate-400 mb-1">Date / Year</label>
-                          <input
-                            type="text"
-                            value={item.date || ''}
-                            onChange={(e) => handleUpdateItem(activeSection.id, itemIdx, 'date', e.target.value)}
-                            placeholder="e.g. Dec 2024"
-                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="text-[11px] font-semibold text-slate-400">Description / Key Accomplishment</label>
-                          {onOpenAIModal && (
-                            <button
-                              type="button"
-                              onClick={() => onOpenAIModal(itemIdx, item.description, item.title)}
-                              className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-300 hover:text-amber-200 cursor-pointer"
-                            >
-                              <Sparkles className="w-3 h-3" /> ✨ AI Rewrite
-                            </button>
-                          )}
-                        </div>
-                        <textarea
-                          rows={2}
-                          value={item.description || ''}
-                          onChange={(e) => handleUpdateItem(activeSection.id, itemIdx, 'description', e.target.value)}
-                          placeholder="Brief details or credential verification info..."
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {activeSection.type === 'badgeGrid' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[11px] font-semibold text-slate-400 mb-1">Skill / Item Name</label>
-                        <input
-                          type="text"
-                          value={item.title || ''}
-                          onChange={(e) => handleUpdateItem(activeSection.id, itemIdx, 'title', e.target.value)}
-                          placeholder="e.g. English / Spanish"
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-semibold text-slate-400 mb-1">Proficiency / Detail</label>
-                        <input
-                          type="text"
-                          value={item.subtitle || ''}
-                          onChange={(e) => handleUpdateItem(activeSection.id, itemIdx, 'subtitle', e.target.value)}
-                          placeholder="e.g. Native / Professional Working"
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {activeSection.type === 'bulletList' && (
+                  {activeSection.type !== 'bulletList' && (
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-400 mb-1">Bullet Achievement</label>
+                      <label className="block text-[10px] font-bold text-slate-400 mb-1">
+                        {activeSection.type === 'badgeGrid' ? 'Proficiency / Subtitle' : 'Issuer / Organization'}
+                      </label>
                       <input
                         type="text"
-                        value={item.title || ''}
-                        onChange={(e) => handleUpdateItem(activeSection.id, itemIdx, 'title', e.target.value)}
-                        placeholder="e.g. Keynote Speaker at Global Tech Conference 2024"
-                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
+                        value={item.subtitle || ''}
+                        onChange={(e) => handleUpdateItem(activeSection.id, item.id, 'subtitle', e.target.value)}
+                        placeholder="e.g. Amazon Web Services"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-red-500"
+                      />
+                    </div>
+                  )}
+
+                  {activeSection.type === 'itemList' && (
+                    <div>
+                      <label className="block text-[10px] font-bold text-slate-400 mb-1">Date / Year</label>
+                      <input
+                        type="text"
+                        value={item.date || ''}
+                        onChange={(e) => handleUpdateItem(activeSection.id, item.id, 'date', e.target.value)}
+                        placeholder="e.g. 2024"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-red-500"
                       />
                     </div>
                   )}
                 </div>
-              ))}
 
-              <button
-                type="button"
-                onClick={() => handleAddItem(activeSection.id)}
-                className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl border border-dashed border-slate-800 bg-slate-950/60 hover:bg-slate-950 text-xs font-bold text-indigo-400 transition-colors cursor-pointer"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Item to {activeSection.title}</span>
-              </button>
-            </div>
-          )}
+                {/* Description for Item List */}
+                {activeSection.type === 'itemList' && (
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="block text-[10px] font-bold text-slate-400">Description / Details</label>
+                      {onOpenAIModal && (
+                        <button
+                          onClick={() => onOpenAIModal(-1, item.description, activeSection.title)}
+                          className="flex items-center gap-1 text-[10px] font-bold text-yellow-400 hover:text-yellow-300"
+                        >
+                          <Sparkles className="w-3 h-3 text-yellow-400" />
+                          <span>AI Rewrite</span>
+                        </button>
+                      )}
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={item.description || ''}
+                      onChange={(e) => handleUpdateItem(activeSection.id, item.id, 'description', e.target.value)}
+                      placeholder="Credential details, key takeaway, or summary..."
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-red-500 leading-relaxed"
+                    />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => handleAddItem(activeSection.id)}
+            className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-bold text-slate-200 border border-slate-800 transition-colors cursor-pointer"
+          >
+            <Plus className="w-4 h-4 text-yellow-400" />
+            <span>Add Item to {activeSection.title}</span>
+          </button>
         </div>
       )}
     </div>

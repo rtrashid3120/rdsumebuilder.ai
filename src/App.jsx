@@ -110,7 +110,7 @@ export default function App() {
     }
   };
 
-  // Direct Vector PDF Export Handler
+  // Direct Vector PDF Export Handler with OKLAB/OKLCH Sanitization
   const handleDownloadPDF = () => {
     setIsExporting(true);
     const element = document.getElementById('printable-resume');
@@ -125,8 +125,35 @@ export default function App() {
       margin: [0, 0, 0, 0],
       filename: `${nameSlug}_Resume.pdf`,
       image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false, scrollX: 0, scrollY: 0 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      html2canvas: { 
+        scale: 2, 
+        useCORS: true, 
+        logging: false,
+        onclone: (clonedDoc) => {
+          const printable = clonedDoc.getElementById('printable-resume');
+          if (printable) {
+            printable.style.backgroundColor = '#ffffff';
+            printable.style.color = '#0f172a';
+            const allElements = printable.getElementsByTagName('*');
+            for (let el of allElements) {
+              const bg = el.style.backgroundColor;
+              const col = el.style.color;
+              const border = el.style.borderColor;
+
+              if (bg && (bg.includes('oklch') || bg.includes('oklab'))) {
+                el.style.backgroundColor = '#ffffff';
+              }
+              if (col && (col.includes('oklch') || col.includes('oklab'))) {
+                el.style.color = '#0f172a';
+              }
+              if (border && (border.includes('oklch') || border.includes('oklab'))) {
+                el.style.borderColor = '#e2e8f0';
+              }
+            }
+          }
+        }
+      },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true }
     };
 
     html2pdf()
