@@ -1,33 +1,33 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { calculateATSScore } from '../utils/atsScorer';
 import { ShieldCheck, ChevronDown, CheckCircle2, AlertCircle, Info, Sparkles, X } from 'lucide-react';
 
 export default function ATSScoreMeter({ resume }) {
   const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
 
   const atsData = calculateATSScore(resume);
   const { score, statusText, badgeColor, breakdown, feedbackTips } = atsData;
 
+  // Handle Escape key to close modal
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
         setIsOpen(false);
       }
     };
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      window.addEventListener('keydown', handleKeyDown);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative">
       
       {/* Header Button Trigger */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen((prev) => !prev)}
         className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-bold transition-all cursor-pointer shadow-md ${badgeColor}`}
         title="Real-Time ATS Readiness Score Meter"
       >
@@ -44,12 +44,15 @@ export default function ATSScoreMeter({ resume }) {
           
           {/* Dark Blur Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/85 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Perfectly Centered Modal Card Box */}
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-5 sm:p-6 z-10 text-white space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar my-auto">
+          <div 
+            className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-5 sm:p-6 z-10 text-white space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar my-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-800 pb-3.5">
