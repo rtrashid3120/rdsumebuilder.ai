@@ -22,12 +22,27 @@ export default function ATSScoreMeter({ resume }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
+  const toggleModal = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsOpen((prev) => !prev);
+  };
+
+  const closeModal = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setIsOpen(false);
+  };
+
   return (
     <div className="relative">
       
       {/* Header Button Trigger */}
       <button
-        onClick={() => setIsOpen((prev) => !prev)}
+        type="button"
+        onClick={toggleModal}
         className={`flex items-center gap-1.5 px-3 py-1 rounded-lg border text-xs font-bold transition-all cursor-pointer shadow-md ${badgeColor}`}
         title="Real-Time ATS Readiness Score Meter"
       >
@@ -39,13 +54,13 @@ export default function ATSScoreMeter({ resume }) {
       </button>
 
       {/* 🔴 REACT PORTAL: MOUNTED DIRECTLY TO DOCUMENT.BODY FOR 100% PERFECT VIEWPORT CENTERING */}
-      {isOpen && createPortal(
+      {isOpen && typeof document !== 'undefined' && createPortal(
         <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-fade-in">
           
           {/* Dark Blur Backdrop */}
           <div 
             className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
-            onClick={() => setIsOpen(false)}
+            onClick={closeModal}
           />
 
           {/* Perfectly Centered Modal Card Box */}
@@ -67,7 +82,8 @@ export default function ATSScoreMeter({ resume }) {
               </div>
 
               <button 
-                onClick={() => setIsOpen(false)}
+                type="button"
+                onClick={closeModal}
                 className="p-1.5 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
@@ -146,7 +162,8 @@ export default function ATSScoreMeter({ resume }) {
             {/* Close Button */}
             <div className="pt-2 border-t border-slate-800 flex justify-end">
               <button
-                onClick={() => setIsOpen(false)}
+                type="button"
+                onClick={closeModal}
                 className="w-full sm:w-auto px-5 py-2 rounded-xl bg-slate-950 hover:bg-slate-800 text-xs font-bold text-slate-300 border border-slate-800 transition-colors cursor-pointer"
               >
                 Close Scanner
