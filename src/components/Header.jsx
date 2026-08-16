@@ -171,59 +171,67 @@ export default function Header({
             </button>
 
             {showColorMenu && (
-              <div className="absolute right-0 mt-2 w-52 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-2 z-50 animate-fade-in space-y-2 text-white">
-                <div className="px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-400 border-b border-slate-800 flex items-center justify-between">
-                  <span>Select Color Accent</span>
-                  <span className="text-[9px] text-slate-400 font-mono">{accentColor}</span>
-                </div>
+              <>
+                {/* Mobile Blur Backdrop for easy dismissal */}
+                <div 
+                  className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[9998] sm:hidden"
+                  onClick={() => setShowColorMenu(false)}
+                />
+                <div className="fixed inset-x-4 top-20 z-[9999] sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 w-auto sm:w-52 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-3 sm:p-2 animate-fade-in space-y-2 text-white">
+                  <div className="px-2 py-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-400 border-b border-slate-800 flex items-center justify-between">
+                    <span>Select Color Accent</span>
+                    <span className="text-[9px] text-slate-400 font-mono">{accentColor}</span>
+                  </div>
 
-                <div className="grid grid-cols-2 gap-1.5">
-                  {colors.map((c) => {
-                    const isSelected = accentColor.toLowerCase() === c.value.toLowerCase();
-                    return (
-                      <button
-                        key={c.name}
-                        onClick={() => {
-                          setAccentColor(c.value);
-                          setShowColorMenu(false);
-                        }}
-                        className={`flex items-center gap-2 p-1.5 rounded-lg border text-left text-xs transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-red-950/40 border-red-500 text-yellow-400 font-bold'
-                            : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'
-                        }`}
-                      >
-                        <span 
-                          className="w-3.5 h-3.5 rounded-full border border-white/20 shrink-0"
-                          style={{ backgroundColor: c.value }}
-                        />
-                        <span className="truncate text-[11px]">{c.name}</span>
-                        {isSelected && <Check className="w-3 h-3 text-yellow-400 ml-auto shrink-0" />}
-                      </button>
-                    );
-                  })}
-                </div>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {colors.map((c) => {
+                      const isSelected = accentColor.toLowerCase() === c.value.toLowerCase();
+                      return (
+                        <button
+                          key={c.name}
+                          type="button"
+                          onClick={() => {
+                            setAccentColor(c.value);
+                            setShowColorMenu(false);
+                          }}
+                          className={`flex items-center gap-2 p-2 sm:p-1.5 rounded-lg border text-left text-xs transition-all cursor-pointer ${
+                            isSelected
+                              ? 'bg-red-950/40 border-red-500 text-yellow-400 font-bold'
+                              : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'
+                          }`}
+                        >
+                          <span 
+                            className="w-4 h-4 sm:w-3.5 sm:h-3.5 rounded-full border border-white/20 shrink-0"
+                            style={{ backgroundColor: c.value }}
+                          />
+                          <span className="truncate text-xs sm:text-[11px]">{c.name}</span>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-yellow-400 ml-auto shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
 
-                <div className="pt-2 border-t border-slate-800 flex items-center justify-between px-1">
-                  <span className="text-[11px] text-slate-400 flex items-center gap-1 font-medium">
-                    <Pipette className="w-3 h-3 text-red-400" /> Custom Hex:
-                  </span>
-                  <div className="flex items-center gap-1.5">
-                    <input
-                      type="color"
-                      value={accentColor}
-                      onChange={(e) => setAccentColor(e.target.value)}
-                      className="w-6 h-6 rounded-md border-0 p-0 cursor-pointer bg-transparent"
-                    />
-                    <input
-                      type="text"
-                      value={accentColor}
-                      onChange={(e) => setAccentColor(e.target.value)}
-                      className="w-16 bg-slate-950 border border-slate-800 rounded px-1.5 py-0.5 text-[11px] text-white font-mono text-center focus:outline-none focus:border-red-500"
-                    />
+                  <div className="pt-2 border-t border-slate-800 flex items-center justify-between px-1">
+                    <span className="text-xs sm:text-[11px] text-slate-400 flex items-center gap-1 font-medium">
+                      <Pipette className="w-3.5 h-3.5 text-red-400" /> Custom Hex:
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="color"
+                        value={accentColor}
+                        onChange={(e) => setAccentColor(e.target.value)}
+                        className="w-7 h-7 sm:w-6 sm:h-6 rounded-md border-0 p-0 cursor-pointer bg-transparent"
+                      />
+                      <input
+                        type="text"
+                        value={accentColor}
+                        onChange={(e) => setAccentColor(e.target.value)}
+                        className="w-18 sm:w-16 bg-slate-950 border border-slate-800 rounded px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] text-white font-mono text-center focus:outline-none focus:border-red-500"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
         </div>
@@ -240,6 +248,7 @@ export default function Header({
           {/* Dynamic Theme Switcher */}
           <div className="relative" ref={themeMenuRef}>
             <button
+              type="button"
               onClick={() => setShowThemeMenu(!showThemeMenu)}
               className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 transition-colors cursor-pointer flex items-center gap-1 text-xs font-semibold"
               title="Theme Mode: Light / Dark / System Adaptive"
@@ -249,50 +258,61 @@ export default function Header({
             </button>
 
             {showThemeMenu && (
-              <div className="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1 z-50 animate-fade-in space-y-0.5">
-                <button
-                  onClick={() => {
-                    setThemeMode('system');
-                    setShowThemeMenu(false);
-                  }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                    themeMode === 'system' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
-                  }`}
-                >
-                  <Laptop className="w-4 h-4 text-yellow-400" />
-                  <span>💻 System Auto</span>
-                </button>
+              <>
+                {/* Mobile Blur Backdrop for easy dismissal */}
+                <div 
+                  className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[9998] sm:hidden"
+                  onClick={() => setShowThemeMenu(false)}
+                />
+                <div className="fixed inset-x-4 top-20 z-[9999] sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 w-auto sm:w-44 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1.5 sm:p-1 animate-fade-in space-y-1 sm:space-y-0.5 text-white">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setThemeMode('system');
+                      setShowThemeMenu(false);
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                      themeMode === 'system' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    <Laptop className="w-4 h-4 text-yellow-400" />
+                    <span>💻 System Auto</span>
+                  </button>
 
-                <button
-                  onClick={() => {
-                    setThemeMode('dark');
-                    setShowThemeMenu(false);
-                  }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                    themeMode === 'dark' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
-                  }`}
-                >
-                  <Moon className="w-4 h-4 text-indigo-400" />
-                  <span>🌙 Dark Mode</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setThemeMode('dark');
+                      setShowThemeMenu(false);
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                      themeMode === 'dark' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    <Moon className="w-4 h-4 text-indigo-400" />
+                    <span>🌙 Dark Mode</span>
+                  </button>
 
-                <button
-                  onClick={() => {
-                    setThemeMode('light');
-                    setShowThemeMenu(false);
-                  }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                    themeMode === 'light' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
-                  }`}
-                >
-                  <Sun className="w-4 h-4 text-amber-400" />
-                  <span>☀️ Light Mode</span>
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setThemeMode('light');
+                      setShowThemeMenu(false);
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                      themeMode === 'light' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                    }`}
+                  >
+                    <Sun className="w-4 h-4 text-amber-400" />
+                    <span>☀️ Light Mode</span>
+                  </button>
+                </div>
+              </>
             )}
           </div>
 
           <button
+            type="button"
             onClick={onLoadSample}
             className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-200 border border-slate-800 transition-colors cursor-pointer"
             title="Populate with sample data"
@@ -302,6 +322,7 @@ export default function Header({
           </button>
 
           <button
+            type="button"
             onClick={onClear}
             className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-300 border border-slate-800 transition-colors cursor-pointer"
             title="Reset form"
@@ -311,6 +332,7 @@ export default function Header({
           </button>
 
           <button
+            type="button"
             onClick={() => setIsPreviewMode(!isPreviewMode)}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               isPreviewMode 
@@ -325,6 +347,7 @@ export default function Header({
           {/* Download Dropdown Button */}
           <div className="relative" ref={menuRef}>
             <button
+              type="button"
               onClick={() => setShowExportMenu(!showExportMenu)}
               disabled={isExporting}
               className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 hover:from-red-500 hover:to-yellow-400 text-xs font-extrabold text-black shadow-lg shadow-red-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer"
@@ -335,39 +358,48 @@ export default function Header({
             </button>
 
             {showExportMenu && (
-              <div className="absolute right-0 mt-2 w-52 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-1.5 z-50 animate-fade-in space-y-1 text-white">
-                <div className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-400 border-b border-slate-800 mb-1">
-                  Download Format:
+              <>
+                {/* Mobile Blur Backdrop for easy dismissal */}
+                <div 
+                  className="fixed inset-0 bg-black/60 backdrop-blur-xs z-[9998] sm:hidden"
+                  onClick={() => setShowExportMenu(false)}
+                />
+                <div className="fixed inset-x-4 top-20 z-[9999] sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 w-auto sm:w-52 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl p-2 sm:p-1.5 animate-fade-in space-y-1 text-white">
+                  <div className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-amber-400 border-b border-slate-800 mb-1">
+                    Download Format:
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowExportMenu(false);
+                      onDownloadPDF();
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-bold text-slate-100 hover:bg-red-950/60 hover:text-yellow-400 rounded-lg transition-colors text-left cursor-pointer border border-transparent hover:border-red-500/40"
+                  >
+                    <Download className="w-4 h-4 text-red-500 shrink-0" />
+                    <div>
+                      <p className="font-extrabold text-white">PDF Document (.pdf)</p>
+                      <p className="text-[10px] text-slate-400 font-normal">Printable Vector PDF Layout</p>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowExportMenu(false);
+                      exportAsDocx(resume);
+                    }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-bold text-slate-100 hover:bg-blue-950/60 hover:text-yellow-400 rounded-lg transition-colors text-left cursor-pointer border border-transparent hover:border-blue-500/40"
+                  >
+                    <FileText className="w-4 h-4 text-blue-400 shrink-0" />
+                    <div>
+                      <p className="font-extrabold text-white">Microsoft Word (.docx)</p>
+                      <p className="text-[10px] text-slate-400 font-normal">Editable Word Document</p>
+                    </div>
+                  </button>
                 </div>
-
-                <button
-                  onClick={() => {
-                    setShowExportMenu(false);
-                    onDownloadPDF();
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-100 hover:bg-red-950/60 hover:text-yellow-400 rounded-lg transition-colors text-left cursor-pointer border border-transparent hover:border-red-500/40"
-                >
-                  <Download className="w-4 h-4 text-red-500 shrink-0" />
-                  <div>
-                    <p className="font-extrabold text-white">PDF Document (.pdf)</p>
-                    <p className="text-[10px] text-slate-400 font-normal">Printable Vector PDF Layout</p>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setShowExportMenu(false);
-                    exportAsDocx(resume);
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-100 hover:bg-blue-950/60 hover:text-yellow-400 rounded-lg transition-colors text-left cursor-pointer border border-transparent hover:border-blue-500/40"
-                >
-                  <FileText className="w-4 h-4 text-blue-400 shrink-0" />
-                  <div>
-                    <p className="font-extrabold text-white">Microsoft Word (.docx)</p>
-                    <p className="text-[10px] text-slate-400 font-normal">Editable Word Document</p>
-                  </div>
-                </button>
-              </div>
+              </>
             )}
           </div>
 
