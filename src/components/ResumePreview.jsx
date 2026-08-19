@@ -4,7 +4,7 @@ import { Mail, Phone, MapPin, Globe, Code2, Link as LinkIcon, AlertTriangle } fr
 export default function ResumePreview({ 
   resume, 
   template = 'modern', 
-  accentColor = '#dc2626',
+  accentColor = '#10b981',
   fontFamily = 'sans',
   sectionOrder = ['summary', 'education', 'experience', 'projects', 'skills'],
   onUpdateText
@@ -16,12 +16,17 @@ export default function ResumePreview({
   const [overflowPercentage, setOverflowPercentage] = useState(100);
 
   const fontClasses = {
-    sans: 'font-sans',
-    serif: 'font-serif',
-    display: 'font-display'
+    sans: 'font-sans-inter',
+    roboto: 'font-sans-roboto',
+    serif: 'font-serif-merriweather',
+    playfair: 'font-serif-playfair',
+    display: 'font-display-outfit',
+    jakarta: 'font-sans-jakarta',
+    fira: 'font-mono-fira',
+    lora: 'font-serif-lora'
   };
 
-  const fontClass = fontClasses[fontFamily] || 'font-sans';
+  const fontClass = fontClasses[fontFamily] || 'font-sans-inter';
 
   // Real-Time A4 Height Monitor (Standard A4 is ~1123px at 96 DPI)
   useEffect(() => {
@@ -65,7 +70,7 @@ export default function ResumePreview({
           contentEditable
           suppressContentEditableWarning
           onBlur={(e) => handleBlur('personalInfo.summary', e)}
-          className="text-xs text-slate-700 leading-relaxed font-normal focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
+          className="text-xs text-slate-700 leading-relaxed font-normal focus:outline-none focus:bg-emerald-50/50 p-0.5 rounded"
         >
           {personalInfo.summary}
         </p>
@@ -90,7 +95,7 @@ export default function ResumePreview({
                 contentEditable
                 suppressContentEditableWarning
                 onBlur={(e) => handleBlur(`education.${idx}.degree`, e)}
-                className="text-xs font-bold text-slate-900 focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
+                className="text-xs font-bold text-slate-900 focus:outline-none focus:bg-emerald-50/50 p-0.5 rounded"
               >
                 {edu.degree || 'Degree'}
               </h3>
@@ -99,29 +104,12 @@ export default function ResumePreview({
                   contentEditable
                   suppressContentEditableWarning
                   onBlur={(e) => handleBlur(`education.${idx}.school`, e)}
-                  className="focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
+                  className="font-medium focus:outline-none focus:bg-emerald-50/50 p-0.5 rounded"
                 >
-                  {edu.school}
-                </span>{' '}
-                <span
-                  contentEditable
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleBlur(`education.${idx}.year`, e)}
-                  className="focus:outline-none focus:bg-red-50/50 p-0.5 rounded font-medium"
-                >
-                  {edu.year ? `(${edu.year})` : ''}
+                  {edu.school || 'School/University'}
                 </span>
+                {edu.year && <span className="text-slate-400 font-normal"> ({edu.year})</span>}
               </p>
-              {edu.gpa && (
-                <p 
-                  contentEditable
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleBlur(`education.${idx}.gpa`, e)}
-                  className="text-[11px] text-slate-500 font-medium focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
-                >
-                  {edu.gpa}
-                </p>
-              )}
             </div>
           ))}
         </div>
@@ -143,39 +131,32 @@ export default function ResumePreview({
           {experience.map((exp, idx) => (
             <div key={exp.id || idx} className="space-y-1">
               <div className="flex flex-wrap items-baseline justify-between gap-1">
-                <h3 className="text-xs font-bold text-slate-900">
-                  <span
+                <div>
+                  <h3 
                     contentEditable
                     suppressContentEditableWarning
                     onBlur={(e) => handleBlur(`experience.${idx}.title`, e)}
-                    className="focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
+                    className="text-xs font-bold text-slate-900 inline focus:outline-none focus:bg-emerald-50/50 p-0.5 rounded"
                   >
-                    {exp.title || 'Position Title'}
-                  </span>{' '}
-                  <span className="font-medium text-slate-500">at</span>{' '}
-                  <span
+                    {exp.title || 'Job Title'}
+                  </h3>
+                  <span className="text-xs text-slate-500 font-medium"> — </span>
+                  <span 
                     contentEditable
                     suppressContentEditableWarning
                     onBlur={(e) => handleBlur(`experience.${idx}.company`, e)}
-                    className="focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
+                    className="text-xs font-semibold text-slate-700 focus:outline-none focus:bg-emerald-50/50 p-0.5 rounded"
                   >
                     {exp.company || 'Company'}
                   </span>
-                </h3>
-                <span 
-                  contentEditable
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleBlur(`experience.${idx}.startDate`, e)}
-                  className="text-[11px] font-semibold text-slate-500 whitespace-nowrap focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
-                >
-                  {exp.startDate} {exp.location ? `| ${exp.location}` : ''}
-                </span>
+                </div>
+                <span className="text-[11px] text-slate-400 font-medium">{exp.startDate}</span>
               </div>
               <p 
                 contentEditable
                 suppressContentEditableWarning
                 onBlur={(e) => handleBlur(`experience.${idx}.description`, e)}
-                className="text-xs text-slate-700 whitespace-pre-line leading-relaxed focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
+                className="text-xs text-slate-700 leading-relaxed whitespace-pre-line font-normal focus:outline-none focus:bg-emerald-50/50 p-0.5 rounded"
               >
                 {exp.description}
               </p>
@@ -189,7 +170,7 @@ export default function ResumePreview({
   const renderProjectsSection = () => {
     if (!projects || projects.length === 0) return null;
     return (
-      <div key="projects" className="space-y-1.5 py-0.5">
+      <div key="projects" className="space-y-2 py-0.5">
         <h2 
           className="text-xs font-extrabold uppercase tracking-widest pb-0.5 border-b"
           style={{ color: accentColor, borderColor: `${accentColor}33` }}
@@ -198,37 +179,28 @@ export default function ResumePreview({
         </h2>
         <div className="space-y-2">
           {projects.map((proj, idx) => (
-            <div key={proj.id || idx}>
-              <div className="flex items-baseline justify-between">
+            <div key={proj.id || idx} className="space-y-0.5">
+              <div className="flex items-baseline justify-between gap-1">
                 <h3 
                   contentEditable
                   suppressContentEditableWarning
                   onBlur={(e) => handleBlur(`projects.${idx}.name`, e)}
-                  className="text-xs font-bold text-slate-900 focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
+                  className="text-xs font-bold text-slate-900 focus:outline-none focus:bg-emerald-50/50 p-0.5 rounded"
                 >
-                  {proj.name}
+                  {proj.name || 'Project Name'}
                 </h3>
                 {proj.techStack && (
-                  <span 
-                    contentEditable
-                    suppressContentEditableWarning
-                    onBlur={(e) => handleBlur(`projects.${idx}.techStack`, e)}
-                    className="text-[11px] font-semibold text-slate-500 focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
-                  >
-                    {proj.techStack}
-                  </span>
+                  <span className="text-[10px] font-mono text-slate-500">{proj.techStack}</span>
                 )}
               </div>
-              {proj.description && (
-                <p 
-                  contentEditable
-                  suppressContentEditableWarning
-                  onBlur={(e) => handleBlur(`projects.${idx}.description`, e)}
-                  className="text-xs text-slate-700 mt-0.5 focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
-                >
-                  {proj.description}
-                </p>
-              )}
+              <p 
+                contentEditable
+                suppressContentEditableWarning
+                onBlur={(e) => handleBlur(`projects.${idx}.description`, e)}
+                className="text-xs text-slate-700 leading-relaxed font-normal focus:outline-none focus:bg-emerald-50/50 p-0.5 rounded"
+              >
+                {proj.description}
+              </p>
             </div>
           ))}
         </div>
@@ -236,167 +208,93 @@ export default function ResumePreview({
     );
   };
 
-  // Pure HTML Table Cell Skills Renderer - 100% PDF Compatible with ZERO Overlap!
   const renderSkillsSection = () => {
     if (!skills || skills.length === 0) return null;
-    
-    const half = Math.ceil(skills.length / 2);
-    const col1 = skills.slice(0, half);
-    const col2 = skills.slice(half);
-
     return (
-      <div key="skills" className="space-y-2 py-0.5">
+      <div key="skills" className="space-y-1.5 py-0.5">
         <h2 
           className="text-xs font-extrabold uppercase tracking-widest pb-0.5 border-b"
           style={{ color: accentColor, borderColor: `${accentColor}33` }}
         >
           Skills & Expertise
         </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 text-xs">
-          {/* Column 1 Table */}
-          <table className="w-full border-collapse">
-            <tbody>
-              {col1.map((s, idx) => {
-                const name = typeof s === 'string' ? s : s.name;
-                const level = typeof s === 'object' ? s.level : '';
-                return (
-                  <tr key={idx} className="border-b border-slate-200">
-                    <td className="py-1.5 font-bold text-slate-900 text-xs text-left align-middle">
-                      <span
-                        contentEditable
-                        suppressContentEditableWarning
-                        onBlur={(e) => handleBlur(`skills.${idx}.name`, e)}
-                        className="focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
-                      >
-                        {name}
-                      </span>
-                    </td>
-                    <td className="py-1.5 text-right text-[10px] font-black uppercase tracking-wider align-middle" style={{ color: accentColor }}>
-                      <span
-                        contentEditable
-                        suppressContentEditableWarning
-                        onBlur={(e) => handleBlur(`skills.${idx}.level`, e)}
-                        className="focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
-                      >
-                        {level}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-
-          {/* Column 2 Table */}
-          <table className="w-full border-collapse">
-            <tbody>
-              {col2.map((s, idx) => {
-                const actualIdx = half + idx;
-                const name = typeof s === 'string' ? s : s.name;
-                const level = typeof s === 'object' ? s.level : '';
-                return (
-                  <tr key={actualIdx} className="border-b border-slate-200">
-                    <td className="py-1.5 font-bold text-slate-900 text-xs text-left align-middle">
-                      <span
-                        contentEditable
-                        suppressContentEditableWarning
-                        onBlur={(e) => handleBlur(`skills.${actualIdx}.name`, e)}
-                        className="focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
-                      >
-                        {name}
-                      </span>
-                    </td>
-                    <td className="py-1.5 text-right text-[10px] font-black uppercase tracking-wider align-middle" style={{ color: accentColor }}>
-                      <span
-                        contentEditable
-                        suppressContentEditableWarning
-                        onBlur={(e) => handleBlur(`skills.${actualIdx}.level`, e)}
-                        className="focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
-                      >
-                        {level}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="flex flex-wrap gap-1.5">
+          {skills.map((skill, idx) => {
+            const skillName = typeof skill === 'string' ? skill : skill.name;
+            const skillLevel = typeof skill === 'object' ? skill.level : '';
+            return (
+              <span 
+                key={idx}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200"
+              >
+                <span>{skillName}</span>
+                {skillLevel && <span className="text-[10px] text-slate-500 font-normal">({skillLevel})</span>}
+              </span>
+            );
+          })}
         </div>
       </div>
     );
   };
 
-  const renderCustomSection = (secId) => {
-    const customSec = customSections.find(c => c.id === secId);
-    if (!customSec || !customSec.items || customSec.items.length === 0) return null;
+  const renderCustomSection = (sectionKey) => {
+    const customSec = customSections.find(c => c.id === sectionKey);
+    if (!customSec) return null;
 
     return (
-      <div key={secId} className="space-y-1.5 py-0.5">
+      <div key={customSec.id} className="space-y-2 py-0.5">
         <h2 
           className="text-xs font-extrabold uppercase tracking-widest pb-0.5 border-b"
           style={{ color: accentColor, borderColor: `${accentColor}33` }}
         >
-          {customSec.title}
+          {customSec.title || 'Custom Section'}
         </h2>
 
-        {customSec.type === 'itemList' && (
-          <div className="space-y-2">
-            {customSec.items.map((item, idx) => (
-              <div key={item.id || idx}>
-                <div className="flex items-baseline justify-between">
-                  <h3 className="text-xs font-bold text-slate-900">
-                    {item.title} {item.subtitle ? <span className="font-normal text-slate-500">| {item.subtitle}</span> : ''}
-                  </h3>
-                  {item.date && <span className="text-[11px] font-semibold text-slate-500">{item.date}</span>}
-                </div>
-                {item.description && <p className="text-xs text-slate-700 mt-0.5">{item.description}</p>}
+        {customSec.type === 'badgeGrid' ? (
+          <div className="flex flex-wrap gap-1.5">
+            {customSec.items?.map((item, idx) => (
+              <div key={item.id || idx} className="bg-slate-100 px-2.5 py-1 rounded text-xs border border-slate-200 flex items-center gap-1.5">
+                <span className="font-bold text-slate-800">{item.title}</span>
+                {item.subtitle && <span className="text-[10px] text-slate-500">• {item.subtitle}</span>}
               </div>
             ))}
           </div>
-        )}
-
-        {customSec.type === 'badgeGrid' && (
-          <table className="w-full border-collapse text-xs">
-            <tbody>
-              {customSec.items.map((item, idx) => (
-                <tr key={item.id || idx} className="border-b border-slate-200">
-                  <td className="py-1.5 font-bold text-slate-900 text-left align-middle">{item.title}</td>
-                  <td className="py-1.5 text-right text-[10px] font-black uppercase tracking-wider align-middle" style={{ color: accentColor }}>{item.subtitle}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-
-        {customSec.type === 'bulletList' && (
-          <ul className="list-disc list-inside text-xs text-slate-700 space-y-1">
-            {customSec.items.map((item, idx) => (
-              <li key={item.id || idx}>{item.title}</li>
+        ) : (
+          <div className="space-y-2">
+            {customSec.items?.map((item, idx) => (
+              <div key={item.id || idx} className="space-y-0.5">
+                <div className="flex items-baseline justify-between gap-1">
+                  <h3 className="text-xs font-bold text-slate-900">{item.title}</h3>
+                  {item.date && <span className="text-[10px] text-slate-400">{item.date}</span>}
+                </div>
+                {item.subtitle && <p className="text-xs text-slate-600 font-medium">{item.subtitle}</p>}
+                {item.description && <p className="text-xs text-slate-700 font-normal">{item.description}</p>}
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     );
   };
 
-  const renderSection = (secKey) => {
-    if (secKey === 'summary') return renderSummarySection();
-    if (secKey === 'education') return renderEducationSection();
-    if (secKey === 'experience') return renderExperienceSection();
-    if (secKey === 'projects') return renderProjectsSection();
-    if (secKey === 'skills') return renderSkillsSection();
-    if (secKey.startsWith('custom-sec-')) return renderCustomSection(secKey);
-    return null;
+  const renderSection = (sectionKey) => {
+    switch (sectionKey) {
+      case 'summary': return renderSummarySection();
+      case 'education': return renderEducationSection();
+      case 'experience': return renderExperienceSection();
+      case 'projects': return renderProjectsSection();
+      case 'skills': return renderSkillsSection();
+      default: return renderCustomSection(sectionKey);
+    }
   };
 
   return (
-    <div className="relative flex flex-col items-center w-full">
+    <div className="w-full flex flex-col items-center">
       
       {/* Real-Time A4 Overflow Warning Indicator */}
       {isOverflowing && (
-        <div className="no-print mb-3 w-full max-w-[210mm] bg-amber-950/90 border border-amber-500/80 rounded-xl p-3 text-white shadow-xl flex items-center justify-between text-xs animate-fade-in">
-          <div className="flex items-center gap-2">
+        <div className="no-print w-full max-w-2xl mb-3 animate-fade-in">
+          <div className="flex items-center gap-2.5 p-3 rounded-xl bg-amber-950/80 border border-amber-500/50 text-amber-200 text-xs font-semibold shadow-lg backdrop-blur-md">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 animate-bounce" />
             <div>
               <span className="font-extrabold text-amber-300">⚠️ A4 Page Height Exceeded ({overflowPercentage}% of 1 Page)</span>
@@ -412,7 +310,7 @@ export default function ResumePreview({
         id="printable-resume" 
         className={`resume-preview-container page-a4 bg-white text-slate-900 shadow-2xl rounded-sm transition-all overflow-hidden ${fontClass}`}
       >
-        {/* TEMPLATE LAYOUT 1: CREATIVE SPLIT */}
+        {/* TEMPLATE 1: CREATIVE SPLIT */}
         {template === 'creative' ? (
           <div className="grid grid-cols-12 min-h-full">
             <div 
@@ -473,16 +371,16 @@ export default function ResumePreview({
             </div>
           </div>
         ) : template === 'executive' ? (
-          /* TEMPLATE LAYOUT 2: EXECUTIVE CLASSIC */
+          /* TEMPLATE 2: EXECUTIVE CLASSIC */
           <div className="p-6 md:p-8 space-y-4">
-            <div className="text-center border-b-2 border-t-2 py-3 space-y-1" style={{ borderColor: accentColor }}>
+            <div className="text-center border-b-2 border-t-2 py-4 space-y-1" style={{ borderColor: accentColor }}>
               <h1 className="text-2xl md:text-3xl font-black text-slate-900 uppercase tracking-widest">
                 {personalInfo.fullName || 'Your Full Name'}
               </h1>
               <p className="text-xs font-bold uppercase tracking-wider text-slate-600" style={{ color: accentColor }}>
                 {personalInfo.jobTitle || 'Professional Job Title'}
               </p>
-              <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-slate-600 pt-1 font-serif">
+              <div className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-xs text-slate-600 pt-1">
                 {personalInfo.email && <span>{personalInfo.email}</span>}
                 {personalInfo.phone && <span>• {personalInfo.phone}</span>}
                 {personalInfo.location && <span>• {personalInfo.location}</span>}
@@ -496,15 +394,162 @@ export default function ResumePreview({
               {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
             </div>
           </div>
+        ) : template === 'minimal' ? (
+          /* TEMPLATE 3: TECH MINIMALIST */
+          <div className="p-6 md:p-8 space-y-4 font-mono text-slate-900">
+            <div className="border-l-4 p-4 bg-slate-50 space-y-1" style={{ borderColor: accentColor }}>
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                {personalInfo.fullName || 'Your Name'}
+              </h1>
+              <p className="text-xs font-bold uppercase" style={{ color: accentColor }}>
+                // {personalInfo.jobTitle || 'Developer'}
+              </p>
+              <p className="text-[11px] text-slate-600">
+                {[personalInfo.email, personalInfo.phone, personalInfo.location, personalInfo.github].filter(Boolean).join(' | ')}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
+            </div>
+          </div>
+        ) : template === 'compact' ? (
+          /* TEMPLATE 4: COMPACT ATS MAX */
+          <div className="p-5 md:p-6 space-y-3 leading-tight text-slate-900">
+            <div className="border-b pb-2">
+              <h1 className="text-xl md:text-2xl font-black uppercase text-slate-900 tracking-wide">
+                {personalInfo.fullName || 'Your Name'}
+              </h1>
+              <p className="text-xs font-bold text-slate-700 uppercase" style={{ color: accentColor }}>
+                {personalInfo.jobTitle || 'Job Title'}
+              </p>
+              <div className="text-[11px] text-slate-600 flex flex-wrap gap-2 pt-0.5">
+                {[personalInfo.email, personalInfo.phone, personalInfo.location, personalInfo.linkedin, personalInfo.website].filter(Boolean).join(' • ')}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
+            </div>
+          </div>
+        ) : template === 'elegant' ? (
+          /* TEMPLATE 5: LUXE ELEGANT SERIF */
+          <div className="p-6 md:p-8 space-y-4 text-slate-800">
+            <div className="text-center border-b-4 border-double pb-4 space-y-1" style={{ borderColor: accentColor }}>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-widest uppercase">
+                {personalInfo.fullName || 'Your Full Name'}
+              </h1>
+              <p className="text-xs italic tracking-widest uppercase text-slate-600" style={{ color: accentColor }}>
+                {personalInfo.jobTitle || 'Executive Title'}
+              </p>
+              <div className="text-xs text-slate-500 pt-1 flex justify-center gap-3">
+                {[personalInfo.email, personalInfo.phone, personalInfo.location, personalInfo.linkedin].filter(Boolean).join('  |  ')}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
+            </div>
+          </div>
+        ) : template === 'silicon' ? (
+          /* TEMPLATE 6: SILICON VALLEY */
+          <div className="p-6 md:p-8 space-y-4">
+            <div className="flex justify-between items-start border-b-2 pb-4" style={{ borderColor: accentColor }}>
+              <div className="space-y-1">
+                <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+                  {personalInfo.fullName || 'Your Name'}
+                </h1>
+                <p className="text-sm font-bold uppercase tracking-wider" style={{ color: accentColor }}>
+                  {personalInfo.jobTitle || 'Software Engineer'}
+                </p>
+              </div>
+              <div className="text-right text-xs text-slate-600 space-y-0.5">
+                {personalInfo.email && <div>{personalInfo.email}</div>}
+                {personalInfo.phone && <div>{personalInfo.phone}</div>}
+                {personalInfo.location && <div>{personalInfo.location}</div>}
+                {personalInfo.github && <div className="font-mono text-[11px]">{personalInfo.github}</div>}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
+            </div>
+          </div>
+        ) : template === 'corporate' ? (
+          /* TEMPLATE 7: CORPORATE GRID */
+          <div className="space-y-4">
+            <div className="p-6 text-white space-y-1" style={{ backgroundColor: accentColor }}>
+              <h1 className="text-2xl md:text-3xl font-black uppercase tracking-wider">
+                {personalInfo.fullName || 'Your Name'}
+              </h1>
+              <p className="text-xs font-bold text-white/90 uppercase tracking-widest">
+                {personalInfo.jobTitle || 'Corporate Professional'}
+              </p>
+              <div className="text-xs text-white/80 pt-2 flex flex-wrap gap-x-4 gap-y-1">
+                {personalInfo.email && <span>✉️ {personalInfo.email}</span>}
+                {personalInfo.phone && <span>📞 {personalInfo.phone}</span>}
+                {personalInfo.location && <span>📍 {personalInfo.location}</span>}
+                {personalInfo.linkedin && <span>🔗 {personalInfo.linkedin}</span>}
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
+            </div>
+          </div>
+        ) : template === 'academic' ? (
+          /* TEMPLATE 8: ACADEMIC CV */
+          <div className="p-6 md:p-8 space-y-4 text-slate-900">
+            <div className="border-b-2 pb-3 space-y-1" style={{ borderColor: accentColor }}>
+              <h1 className="text-2xl font-bold text-slate-900">
+                {personalInfo.fullName || 'Academic Curriculum Vitae'}
+              </h1>
+              <p className="text-xs font-semibold text-slate-600">
+                {personalInfo.jobTitle || 'Researcher / Educator'}
+              </p>
+              <div className="text-xs text-slate-500 flex flex-wrap gap-x-3">
+                {personalInfo.email && <span>Email: {personalInfo.email}</span>}
+                {personalInfo.phone && <span>Tel: {personalInfo.phone}</span>}
+                {personalInfo.location && <span>Location: {personalInfo.location}</span>}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
+            </div>
+          </div>
+        ) : template === 'pill' ? (
+          /* TEMPLATE 9: MODERN PILL HEADER */
+          <div className="p-6 md:p-8 space-y-4">
+            <div className="p-5 rounded-2xl text-white space-y-2 shadow-md" style={{ backgroundColor: accentColor }}>
+              <h1 className="text-2xl md:text-3xl font-black">
+                {personalInfo.fullName || 'Your Name'}
+              </h1>
+              <p className="text-xs font-bold text-white/90 uppercase tracking-wider">
+                {personalInfo.jobTitle || 'Creative Specialist'}
+              </p>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {[personalInfo.email, personalInfo.phone, personalInfo.location, personalInfo.linkedin].filter(Boolean).map((info, idx) => (
+                  <span key={idx} className="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-semibold">
+                    {info}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {sectionOrder.map((sectionKey) => renderSection(sectionKey))}
+            </div>
+          </div>
         ) : (
-          /* DEFAULT / MODERN SLATE TEMPLATE */
+          /* TEMPLATE 10: DEFAULT / MODERN SLATE */
           <div className="p-6 md:p-8 space-y-4 text-slate-800 leading-relaxed">
             <div className="border-b-2 pb-3" style={{ borderColor: accentColor }}>
               <h1 
                 contentEditable
                 suppressContentEditableWarning
                 onBlur={(e) => handleBlur('personalInfo.fullName', e)}
-                className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-1 break-words focus:outline-none focus:bg-red-50/50 p-0.5 rounded"
+                className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mb-1 break-words focus:outline-none focus:bg-emerald-50/50 p-0.5 rounded"
               >
                 {personalInfo.fullName || 'Your Full Name'}
               </h1>
@@ -512,7 +557,7 @@ export default function ResumePreview({
                 contentEditable
                 suppressContentEditableWarning
                 onBlur={(e) => handleBlur('personalInfo.jobTitle', e)}
-                className="text-xs md:text-sm font-semibold uppercase tracking-wider mb-2 focus:outline-none focus:bg-red-50/50 p-0.5 rounded" 
+                className="text-xs md:text-sm font-semibold uppercase tracking-wider mb-2 focus:outline-none focus:bg-emerald-50/50 p-0.5 rounded" 
                 style={{ color: accentColor }}
               >
                 {personalInfo.jobTitle || 'Professional Job Title'}

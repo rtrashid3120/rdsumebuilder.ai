@@ -108,7 +108,7 @@ export default function FormSection({
   return (
     <div className="bg-black/80 border border-slate-900 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md space-y-0 relative">
       
-      {/* Navigation Tabs - Red & Yellow High Impact Style */}
+      {/* Navigation Tabs - Executive Emerald & Gold High Impact Style */}
       <div className="flex items-center justify-between border-b border-slate-900 bg-slate-950/80 overflow-x-auto no-scrollbar">
         <div className="flex">
           {tabs.map((tab) => {
@@ -117,26 +117,27 @@ export default function FormSection({
             return (
               <button
                 key={tab.id}
+                type="button"
                 onClick={() => handleTabClick(tab.id)}
                 className={`flex items-center gap-2 px-4 py-3.5 text-xs font-bold whitespace-nowrap border-b-2 transition-all cursor-pointer ${
                   isActive
-                    ? 'border-red-500 text-red-500 bg-red-950/30'
+                    ? 'border-emerald-500 text-emerald-400 bg-emerald-950/30'
                     : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-red-500' : 'text-slate-500'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-500'}`} />
                 <span>{tab.label}</span>
                 
                 {tab.badge && (
-                  <span className="inline-flex items-center gap-0.5 text-[10px] font-black px-1.5 py-0.2 rounded bg-yellow-400/20 text-yellow-400 border border-yellow-400/30">
-                    <Sparkles className="w-2.5 h-2.5 text-yellow-400" />
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-black px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-400 border border-amber-400/30">
+                    <Sparkles className="w-2.5 h-2.5 text-amber-400" />
                     {tab.badge}
                   </span>
                 )}
 
                 {tab.count !== null && (
                   <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                    isActive ? 'bg-red-500/20 text-red-400' : 'bg-slate-800 text-slate-400'
+                    isActive ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-800 text-slate-400'
                   }`}>
                     {tab.count}
                   </span>
@@ -148,11 +149,12 @@ export default function FormSection({
 
         {/* Section Reorder Button */}
         <button
+          type="button"
           onClick={() => setShowOrderManager(!showOrderManager)}
           className={`px-3 py-2 mr-2 rounded-lg text-xs font-bold border flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer ${
             showOrderManager 
-              ? 'bg-red-600 text-white border-red-500 shadow-md shadow-red-600/30' 
-              : 'bg-red-950/30 hover:bg-red-950/50 text-red-400 border border-red-900/40'
+              ? 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-600/30' 
+              : 'bg-emerald-950/30 hover:bg-emerald-950/50 text-emerald-400 border border-emerald-900/40'
           }`}
           title="Reorder Resume Sections"
         >

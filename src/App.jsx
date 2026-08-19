@@ -286,10 +286,11 @@ export default function App() {
         {!isPreviewMode && (
           <div className="lg:hidden flex grid grid-cols-2 bg-slate-900 border border-slate-800 p-1 rounded-2xl mb-4 shadow-lg text-xs font-bold">
             <button
+              type="button"
               onClick={() => setMobileTab('editor')}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-xl transition-all cursor-pointer ${
                 mobileTab === 'editor'
-                  ? 'bg-red-600 text-white shadow-md font-extrabold'
+                  ? 'bg-emerald-600 text-white shadow-md font-extrabold'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -298,14 +299,15 @@ export default function App() {
             </button>
 
             <button
+              type="button"
               onClick={() => setMobileTab('preview')}
               className={`flex items-center justify-center gap-2 py-2.5 rounded-xl transition-all cursor-pointer ${
                 mobileTab === 'preview'
-                  ? 'bg-red-600 text-white shadow-md font-extrabold'
+                  ? 'bg-emerald-600 text-white shadow-md font-extrabold'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              <Eye className="w-4 h-4 text-yellow-400" />
+              <Eye className="w-4 h-4 text-amber-400" />
               <span>Resume Preview (A4)</span>
             </button>
           </div>
@@ -320,8 +322,9 @@ export default function App() {
                 <span>Full Preview & Direct In-Place Edit Mode — Click any text on the resume to edit directly</span>
               </div>
               <button
+                type="button"
                 onClick={() => setIsPreviewMode(false)}
-                className="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-xs font-bold text-white shadow-md cursor-pointer"
+                className="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white shadow-md cursor-pointer"
               >
                 Back to Editor
               </button>

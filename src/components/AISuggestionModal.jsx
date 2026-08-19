@@ -152,6 +152,7 @@ export default function AISuggestionModal({ isOpen, onClose, originalText, jobTi
           </button>
 
           <button
+            type="button"
             onClick={() => {
               if (currentSuggestionText) {
                 onAccept(currentSuggestionText);
@@ -159,7 +160,7 @@ export default function AISuggestionModal({ isOpen, onClose, originalText, jobTi
               }
             }}
             disabled={loading || !currentSuggestionText}
-            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-xs font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 hover:from-emerald-600 hover:to-cyan-700 text-xs font-bold text-white shadow-lg shadow-emerald-500/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer border border-emerald-400/30"
           >
             <Check className="w-4 h-4" />
             <span>Accept AI Suggestion</span>

@@ -49,14 +49,14 @@ export default function Header({
   }, []);
 
   const colors = [
-    { name: 'Crimson Red', value: '#dc2626' },
-    { name: 'Neon Flame', value: '#ff2a55' },
-    { name: 'Cyber Yellow', value: '#eab308' },
-    { name: 'Amber Gold', value: '#d97706' },
+    { name: 'Emerald Green', value: '#10b981' },
+    { name: 'Teal Mint', value: '#14b8a6' },
+    { name: 'Amber Gold', value: '#f59e0b' },
+    { name: 'Royal Sapphire', value: '#3b82f6' },
+    { name: 'Deep Violet', value: '#8b5cf6' },
+    { name: 'Crimson Red', value: '#ef4444' },
     { name: 'Obsidian Black', value: '#0f172a' },
-    { name: 'Royal Indigo', value: '#4f46e5' },
-    { name: 'Emerald Teal', value: '#059669' },
-    { name: 'Deep Violet', value: '#7c3aed' },
+    { name: 'Sunset Coral', value: '#f97316' },
   ];
 
   const currentColorObj = colors.find(c => c.value.toLowerCase() === accentColor.toLowerCase()) || {
@@ -65,9 +65,14 @@ export default function Header({
   };
 
   const fonts = [
-    { id: 'sans', label: 'Inter (Sans)' },
-    { id: 'serif', label: 'Merriweather (Serif)' },
-    { id: 'display', label: 'Outfit (Display)' },
+    { id: 'sans', label: 'Inter (Modern Sans)' },
+    { id: 'roboto', label: 'Roboto (Tech Sans)' },
+    { id: 'serif', label: 'Merriweather (Classic Serif)' },
+    { id: 'playfair', label: 'Playfair (Luxury Serif)' },
+    { id: 'display', label: 'Outfit (Modern Display)' },
+    { id: 'jakarta', label: 'Plus Jakarta (SaaS Sans)' },
+    { id: 'fira', label: 'Fira Code (Tech Mono)' },
+    { id: 'lora', label: 'Lora (Refined Serif)' },
   ];
 
   const themeIcons = {
@@ -79,7 +84,7 @@ export default function Header({
   const ThemeIcon = themeIcons[themeMode] || Laptop;
 
   return (
-    <header className="no-print sticky top-0 z-40 bg-slate-950/95 dark:bg-black/95 backdrop-blur-md border-b border-slate-800 text-white px-3 sm:px-4 lg:px-8 py-2.5 shadow-2xl transition-all">
+    <header className="no-print sticky top-0 z-40 bg-slate-950/95 dark:bg-[#0b0f17]/95 backdrop-blur-md border-b border-slate-800 text-white px-3 sm:px-4 lg:px-8 py-2.5 shadow-2xl transition-all">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-3">
         
         {/* Brand Executive Logo & Title */}
@@ -88,10 +93,10 @@ export default function Header({
           <div>
             <div className="flex items-center gap-1.5 sm:gap-2">
               <h1 className="text-base sm:text-lg font-black tracking-tight text-white leading-none">
-                ResumeBuilder<span className="text-red-500">.ai</span>
+                ResumeBuilder<span className="text-emerald-400">.ai</span>
               </h1>
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-yellow-400/10 text-yellow-400 border border-yellow-400/30">
-                <Sparkles className="w-2.5 h-2.5 text-yellow-400 animate-spin-slow" />
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-400/10 text-amber-400 border border-amber-400/30">
+                <Sparkles className="w-2.5 h-2.5 text-amber-400 animate-spin-slow" />
                 AI Active
               </span>
             </div>
@@ -109,8 +114,9 @@ export default function Header({
 
           {/* Cover Letter Generator Toggle Button */}
           <button
+            type="button"
             onClick={onOpenCoverLetter}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-400/10 hover:bg-yellow-400/20 text-yellow-400 border border-yellow-400/30 text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 text-amber-400 border border-amber-400/30 text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0"
             title="Generate Matching Cover Letter"
           >
             <FileSignature className="w-3.5 h-3.5" />
@@ -119,32 +125,36 @@ export default function Header({
 
           <div className="h-4 w-px bg-slate-800 hidden sm:block" />
 
-          {/* Template Selector Dropdown */}
+          {/* Template Selector Dropdown (10 Premium Templates) */}
           <div className="flex items-center gap-1 text-xs font-semibold text-slate-300 shrink-0">
-            <LayoutTemplate className="w-3.5 h-3.5 text-red-500 shrink-0" />
+            <LayoutTemplate className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
             <select
               value={activeTemplate}
               onChange={(e) => setActiveTemplate(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-lg text-xs px-2 py-1 text-white font-medium focus:outline-none focus:border-red-500 cursor-pointer max-w-[100px] sm:max-w-none"
+              className="bg-slate-950 border border-slate-800 rounded-lg text-xs px-2 py-1 text-white font-medium focus:outline-none focus:border-emerald-500 cursor-pointer max-w-[110px] sm:max-w-none"
             >
               <option value="modern">Modern Slate</option>
               <option value="executive">Executive Classic</option>
-              <option value="minimal">Tech Minimalist</option>
               <option value="creative">Creative Split</option>
-              <option value="compact">Compact ATS</option>
+              <option value="minimal">Tech Minimalist</option>
+              <option value="compact">Compact ATS Max</option>
               <option value="elegant">Luxe Serif</option>
+              <option value="silicon">Silicon Valley</option>
+              <option value="corporate">Corporate Grid</option>
+              <option value="academic">Academic CV</option>
+              <option value="pill">Modern Pill Header</option>
             </select>
           </div>
 
           <div className="h-4 w-px bg-slate-800 hidden md:block" />
 
-          {/* Font Selector Dropdown */}
+          {/* Font Selector Dropdown (8 Professional Fonts) */}
           <div className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-            <Type className="w-3.5 h-3.5 text-yellow-400 shrink-0" />
+            <Type className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             <select
               value={activeFont}
               onChange={(e) => setActiveFont(e.target.value)}
-              className="bg-slate-950 border border-slate-800 rounded-lg text-xs px-2 py-1 text-white font-medium focus:outline-none focus:border-yellow-400 cursor-pointer"
+              className="bg-slate-950 border border-slate-800 rounded-lg text-xs px-2 py-1 text-white font-medium focus:outline-none focus:border-amber-400 cursor-pointer"
             >
               {fonts.map(f => (
                 <option key={f.id} value={f.id}>{f.label}</option>
@@ -157,11 +167,12 @@ export default function Header({
           {/* Accent Color Dropdown */}
           <div className="relative shrink-0" ref={colorMenuRef}>
             <button
+              type="button"
               onClick={() => setShowColorMenu(!showColorMenu)}
               className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 text-xs font-semibold text-white border border-slate-800 transition-all cursor-pointer"
               title="Accent Color Selection"
             >
-              <Palette className="w-3.5 h-3.5 text-red-500 shrink-0" />
+              <Palette className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <div 
                 className="w-3.5 h-3.5 rounded-full border border-white/20 shadow-xs shrink-0" 
                 style={{ backgroundColor: accentColor }}
@@ -196,7 +207,7 @@ export default function Header({
                           }}
                           className={`flex items-center gap-2 p-2 sm:p-1.5 rounded-lg border text-left text-xs transition-all cursor-pointer ${
                             isSelected
-                              ? 'bg-red-950/40 border-red-500 text-yellow-400 font-bold'
+                              ? 'bg-emerald-950/40 border-emerald-500 text-amber-400 font-bold'
                               : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'
                           }`}
                         >
@@ -205,7 +216,7 @@ export default function Header({
                             style={{ backgroundColor: c.value }}
                           />
                           <span className="truncate text-xs sm:text-[11px]">{c.name}</span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-yellow-400 ml-auto shrink-0" />}
+                          {isSelected && <Check className="w-3.5 h-3.5 text-amber-400 ml-auto shrink-0" />}
                         </button>
                       );
                     })}
@@ -213,7 +224,7 @@ export default function Header({
 
                   <div className="pt-2 border-t border-slate-800 flex items-center justify-between px-1">
                     <span className="text-xs sm:text-[11px] text-slate-400 flex items-center gap-1 font-medium">
-                      <Pipette className="w-3.5 h-3.5 text-red-400" /> Custom Hex:
+                      <Pipette className="w-3.5 h-3.5 text-emerald-400" /> Custom Hex:
                     </span>
                     <div className="flex items-center gap-1.5">
                       <input
@@ -226,7 +237,7 @@ export default function Header({
                         type="text"
                         value={accentColor}
                         onChange={(e) => setAccentColor(e.target.value)}
-                        className="w-18 sm:w-16 bg-slate-950 border border-slate-800 rounded px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] text-white font-mono text-center focus:outline-none focus:border-red-500"
+                        className="w-18 sm:w-16 bg-slate-950 border border-slate-800 rounded px-1.5 py-1 sm:py-0.5 text-xs sm:text-[11px] text-white font-mono text-center focus:outline-none focus:border-emerald-500"
                       />
                     </div>
                   </div>
@@ -253,7 +264,7 @@ export default function Header({
               className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800 transition-colors cursor-pointer flex items-center gap-1 text-xs font-semibold"
               title="Theme Mode: Light / Dark / System Adaptive"
             >
-              <ThemeIcon className="w-3.5 h-3.5 text-yellow-400" />
+              <ThemeIcon className="w-3.5 h-3.5 text-amber-400" />
               <span className="hidden lg:inline capitalize">{themeMode}</span>
             </button>
 
@@ -272,10 +283,10 @@ export default function Header({
                       setShowThemeMenu(false);
                     }}
                     className={`w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                      themeMode === 'system' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                      themeMode === 'system' ? 'bg-emerald-600/20 text-emerald-300 font-bold border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800'
                     }`}
                   >
-                    <Laptop className="w-4 h-4 text-yellow-400" />
+                    <Laptop className="w-4 h-4 text-amber-400" />
                     <span>💻 System Auto</span>
                   </button>
 
@@ -286,7 +297,7 @@ export default function Header({
                       setShowThemeMenu(false);
                     }}
                     className={`w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                      themeMode === 'dark' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                      themeMode === 'dark' ? 'bg-emerald-600/20 text-emerald-300 font-bold border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800'
                     }`}
                   >
                     <Moon className="w-4 h-4 text-indigo-400" />
@@ -300,7 +311,7 @@ export default function Header({
                       setShowThemeMenu(false);
                     }}
                     className={`w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
-                      themeMode === 'light' ? 'bg-red-600/20 text-yellow-400 font-bold' : 'text-slate-300 hover:bg-slate-800'
+                      themeMode === 'light' ? 'bg-emerald-600/20 text-emerald-300 font-bold border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800'
                     }`}
                   >
                     <Sun className="w-4 h-4 text-amber-400" />
@@ -317,7 +328,7 @@ export default function Header({
             className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-xs font-semibold text-slate-200 border border-slate-800 transition-colors cursor-pointer"
             title="Populate with sample data"
           >
-            <FileCheck className="w-3.5 h-3.5 text-yellow-400" />
+            <FileCheck className="w-3.5 h-3.5 text-amber-400" />
             <span className="hidden sm:inline">Sample Data</span>
           </button>
 
@@ -336,7 +347,7 @@ export default function Header({
             onClick={() => setIsPreviewMode(!isPreviewMode)}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               isPreviewMode 
-                ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' 
+                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30' 
                 : 'bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-800'
             }`}
           >
@@ -344,15 +355,15 @@ export default function Header({
             <span className="hidden sm:inline">{isPreviewMode ? 'Edit Mode' : 'Full Preview'}</span>
           </button>
 
-          {/* Download Dropdown Button */}
+          {/* Download Dropdown Button - Executive Emerald Gradient */}
           <div className="relative" ref={menuRef}>
             <button
               type="button"
               onClick={() => setShowExportMenu(!showExportMenu)}
               disabled={isExporting}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 hover:from-red-500 hover:to-yellow-400 text-xs font-extrabold text-black shadow-lg shadow-red-600/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-slate-950 font-black shadow-lg shadow-emerald-500/25 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 cursor-pointer border border-emerald-400/30 text-xs"
             >
-              <Download className="w-3.5 h-3.5 text-black" />
+              <Download className="w-3.5 h-3.5 text-slate-950" />
               <span>Download</span>
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showExportMenu ? 'rotate-180' : ''}`} />
             </button>
@@ -375,9 +386,9 @@ export default function Header({
                       setShowExportMenu(false);
                       onDownloadPDF();
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-bold text-slate-100 hover:bg-red-950/60 hover:text-yellow-400 rounded-lg transition-colors text-left cursor-pointer border border-transparent hover:border-red-500/40"
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-bold text-slate-100 hover:bg-emerald-950/60 hover:text-emerald-300 rounded-lg transition-colors text-left cursor-pointer border border-transparent hover:border-emerald-500/40"
                   >
-                    <Download className="w-4 h-4 text-red-500 shrink-0" />
+                    <Download className="w-4 h-4 text-emerald-400 shrink-0" />
                     <div>
                       <p className="font-extrabold text-white">PDF Document (.pdf)</p>
                       <p className="text-[10px] text-slate-400 font-normal">Printable Vector PDF Layout</p>
@@ -390,9 +401,9 @@ export default function Header({
                       setShowExportMenu(false);
                       exportAsDocx(resume);
                     }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-bold text-slate-100 hover:bg-blue-950/60 hover:text-yellow-400 rounded-lg transition-colors text-left cursor-pointer border border-transparent hover:border-blue-500/40"
+                    className="w-full flex items-center gap-2.5 px-3 py-2.5 sm:py-2 text-xs font-bold text-slate-100 hover:bg-blue-950/60 hover:text-teal-300 rounded-lg transition-colors text-left cursor-pointer border border-transparent hover:border-blue-500/40"
                   >
-                    <FileText className="w-4 h-4 text-blue-400 shrink-0" />
+                    <FileText className="w-4 h-4 text-teal-400 shrink-0" />
                     <div>
                       <p className="font-extrabold text-white">Microsoft Word (.docx)</p>
                       <p className="text-[10px] text-slate-400 font-normal">Editable Word Document</p>

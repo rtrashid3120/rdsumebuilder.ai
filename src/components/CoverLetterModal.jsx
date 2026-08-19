@@ -157,8 +157,8 @@ export default function CoverLetterModal({
         {/* Top Header Bar */}
         <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3.5 border-b border-slate-800 bg-slate-950 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-red-600 via-amber-500 to-yellow-400 flex items-center justify-center shadow-lg shadow-red-600/30 shrink-0">
-              <FileSignature className="w-4 h-4 sm:w-5 sm:h-5 text-black" />
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/30 shrink-0">
+              <FileSignature className="w-4 h-4 sm:w-5 sm:h-5 text-slate-950 font-extrabold" />
             </div>
             <div>
               <h2 className="text-xs sm:text-base font-black text-white flex items-center gap-1.5 leading-tight">
@@ -171,26 +171,29 @@ export default function CoverLetterModal({
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={handleCopyText}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-md ${
                 copied 
                   ? 'bg-emerald-600 text-white' 
-                  : 'bg-slate-800 hover:bg-slate-700 text-yellow-400 border border-slate-700'
+                  : 'bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700'
               }`}
             >
-              {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5 text-yellow-400" />}
+              {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5 text-amber-400" />}
               <span className="hidden sm:inline">{copied ? 'Copied!' : '📋 Copy Text'}</span>
             </button>
 
             <button
+              type="button"
               onClick={handleDownloadPDF}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-red-600 via-amber-500 to-yellow-500 hover:from-red-500 hover:to-yellow-400 text-xs font-black text-black shadow-lg shadow-red-600/30 transition-all cursor-pointer"
+              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-xs font-black text-slate-950 shadow-lg shadow-emerald-500/30 transition-all cursor-pointer border border-emerald-400/30"
             >
-              <Download className="w-3.5 h-3.5 text-black" />
+              <Download className="w-3.5 h-3.5 text-slate-950" />
               <span>📄 PDF</span>
             </button>
 
             <button 
+              type="button"
               onClick={onClose}
               className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 cursor-pointer"
             >
@@ -202,9 +205,10 @@ export default function CoverLetterModal({
         {/* Mobile Tab Switcher Bar (Only visible on mobile screens < lg) */}
         <div className="flex lg:hidden grid grid-cols-2 bg-slate-950 border-b border-slate-800 p-1 shrink-0">
           <button
+            type="button"
             onClick={() => setMobileTab('editor')}
             className={`flex items-center justify-center gap-1.5 py-2 text-xs font-extrabold rounded-xl transition-all cursor-pointer ${
-              mobileTab === 'editor' ? 'bg-red-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+              mobileTab === 'editor' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
             }`}
           >
             <Edit3 className="w-3.5 h-3.5" />
@@ -212,9 +216,10 @@ export default function CoverLetterModal({
           </button>
 
           <button
+            type="button"
             onClick={() => setMobileTab('preview')}
             className={`flex items-center justify-center gap-1.5 py-2 text-xs font-extrabold rounded-xl transition-all cursor-pointer ${
-              mobileTab === 'preview' ? 'bg-red-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+              mobileTab === 'preview' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
             }`}
           >
             <Eye className="w-3.5 h-3.5" />
